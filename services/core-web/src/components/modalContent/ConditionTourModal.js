@@ -1,14 +1,14 @@
 /* eslint-disable */
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { maxBy } from "lodash";
+import AddButton from "@/components/common/AddButton";
 import { Divider } from "antd";
+import Joyride, { STATUS } from "react-joyride";
 import Condition from "@/components/Forms/permits/conditions/Condition";
-import AddCondition from "@/components/Forms/permits/conditions/AddCondition";
 
 const permitConditions = [
   {
-    condition: "Testing Section",
+    condition: "Permit Approval",
     condition_category_code: "GEC",
     condition_type_code: "SEC",
     display_order: 1,
@@ -19,7 +19,8 @@ const permitConditions = [
     step: "1.",
     sub_conditions: [
       {
-        condition: "testing",
+        condition:
+          "Write out activities and total disturbance as indicated in the Notice of Work application (that you approve of – you must specify activities that were applied for that you do not approve of if there are any)",
         condition_category_code: "GEC",
         condition_type_code: "CON",
         display_order: 1,
@@ -44,6 +45,30 @@ const permitConditions = [
       },
     ],
   },
+  {
+    condition: "Permit",
+    condition_category_code: "GEC",
+    condition_type_code: "SEC",
+    display_order: 1,
+    parent_permit_condition_id: null,
+    permit_amendment_id: 53,
+    permit_condition_guid: "2707723f-58fc-45d7-835a-7d48a715ada9",
+    permit_condition_id: 254,
+    step: "2.",
+    sub_conditions: [
+      {
+        condition: "This Permit is not transferable or assignable.",
+        condition_category_code: "GEC",
+        condition_type_code: "LIS",
+        display_order: 1,
+        parent_permit_condition_id: 255,
+        permit_amendment_id: 53,
+        permit_condition_guid: "04549039-8306-4b95-b34b-1973506e65fd",
+        permit_condition_id: 256,
+        step: "i.",
+      },
+    ],
+  },
 ];
 
 const propTypes = {
@@ -55,39 +80,113 @@ const propTypes = {
 };
 
 export class ConditionTourModal extends Component {
+  state = {
+    run: true,
+    steps: [
+      {
+        content:
+          "Virtual Demonstration of how to create permit conditions inside CORE! Click Next to start the tour.",
+        target: "body",
+        placement: "center",
+      },
+      {
+        target: ".field-title",
+        content:
+          "This is a Sub-section title, it is used to organize conditions into similar categories",
+      },
+      {
+        target: ".add-btn",
+        content: "Click here if you would like to create another Sub-Section!",
+      },
+      {
+        target: ".ant-btn-background-ghost.ant-btn-primary",
+        content: "This another awesome feature!",
+      },
+      {
+        target: ".ant-btn-background-ghost.ant-btn-primary",
+        content: "This is my awesome feature!",
+      },
+      {
+        target: ".ant-btn-background-ghost.ant-btn-primary",
+        content: "This another awesome feature!",
+      },
+      {
+        target: ".ant-btn.full-mobile.btn--middle.ant-btn-secondary",
+        content: "This is my awesome feature!",
+      },
+      {
+        target: ".ant-btn.full-mobile.btn--middle.ant-btn-secondary",
+        content: "This another awesome feature!",
+      },
+    ],
+  };
+
+  reorderConditions = (condition, isMoveUp) => {
+    console.log(condition);
+    condition.display_order = isMoveUp ? condition.display_order - 1 : condition.display_order + 1;
+  };
+
+  handleEdit = (values) => {
+    console.log("editing");
+  };
+
+  handleJoyrideCallback = (data) => {
+    const { status, type } = data;
+    if ([STATUS.FINISHED].includes(status)) {
+      // Need to set our running state to false, so we can restart if we click start again.
+      this.setState({ run: false });
+      this.props.closeModal();
+    }
+
+    console.groupCollapsed(type);
+    console.log(data); //eslint-disable-line no-console
+    console.groupEnd();
+  };
+
   render() {
     return (
       <>
-        {this.props.permitConditionCategoryOptions.map((conditionCategory) => {
-          const conditions = permitConditions.filter(
-            (condition) =>
-              condition.condition_category_code === conditionCategory.condition_category_code
-          );
-          <div>
-            {conditions.map((condition) => (
-              <Condition
-                condition={condition}
-                reorderConditions={this.props.reorderConditions}
-                handleSubmit={this.props.handleEdit}
-                handleDelete={this.props.openDeleteConditionModal}
-                setConditionEditingFlag={this.props.setConditionEditingFlag}
-                editingConditionFlag={this.props.editingConditionFlag}
-              />
-            ))}
-            <Divider />
-            <AddCondition
-              initialValues={{
-                condition_category_code: conditionCategory.condition_category_code,
-                condition_type_code: "SEC",
-                display_order:
-                  conditions.length === 0
-                    ? 1
-                    : maxBy(conditions, "display_order").display_order + 1,
-                permit_amendment_id: this.props.draftPermitAmendment.permit_amendment_id,
-              }}
+        <div>
+          <Joyride
+            steps={this.state.steps}
+            callback={this.handleJoyrideCallback}
+            continuous
+            showProgress
+            run={this.state.run}
+            styles={{
+              options: {
+                // arrowColor: "#e3ffeb",
+                // backgroundColor: "#e3ffeb",
+                // overlayColor: "rgba(79, 26, 0, 0.4)",
+                // primaryColor: "#7c66ad",
+                // textColor: "#004a14",
+                zIndex: 1000,
+              },
+            }}
+          />
+          {permitConditions.map((condition) => (
+            <Condition
+              condition={condition}
+              reorderConditions={this.reorderConditions}
+              handleSubmit={this.handleEdit}
+              handleDelete={() => {}}
+              setConditionEditingFlag={this.props.setConditionEditingFlag}
+              editingConditionFlag={this.props.editingConditionFlag}
             />
-          </div>;
-        })}
+          ))}
+          <Divider />
+          <AddButton type="secondary" onClick={() => {}} className="add-btn">
+            Add Sub-Section
+          </AddButton>
+          {/* <AddCondition
+            initialValues={{
+              condition_category_code: "HSC",
+              condition_type_code: "SEC",
+              display_order: 2,
+              permit_amendment_id: this.props.draftPermitAmendment.permit_amendment_id,
+            }}
+          /> */}
+        </div>
       </>
     );
   }

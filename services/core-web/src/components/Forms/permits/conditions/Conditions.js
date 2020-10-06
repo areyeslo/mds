@@ -99,7 +99,9 @@ export class Conditions extends Component {
         setConditionEditingFlag: this.setConditionEditingFlag,
         editingConditionFlag: this.props.editingConditionFlag,
         permitConditionCategoryOptions: this.props.permitConditionCategoryOptions,
+        draftPermitAmendment: this.props.draftPermitAmendment,
       },
+      isViewOnly: true,
       width: "80vw",
       content: modalConfig.CONDITION_TOUR_MODAL,
     });
