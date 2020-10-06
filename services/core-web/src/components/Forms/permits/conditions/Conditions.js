@@ -88,6 +88,23 @@ export class Conditions extends Component {
     });
   };
 
+  openConditionTourModal = () => {
+    this.props.openModal({
+      props: {
+        title: "Virtal Walkthrough",
+        closeModal: this.props.closeModal,
+        reorderConditions: this.reorderConditions,
+        handleSubmit: this.handleEdit,
+        handleDelete: this.openDeleteConditionModal,
+        setConditionEditingFlag: this.setConditionEditingFlag,
+        editingConditionFlag: this.props.editingConditionFlag,
+        permitConditionCategoryOptions: this.props.permitConditionCategoryOptions,
+      },
+      width: "80vw",
+      content: modalConfig.CONDITION_TOUR_MODAL,
+    });
+  };
+
   handleEdit = (values) =>
     this.props.updatePermitCondition(values.permit_condition_guid, values).then(() => {
       this.props.fetchPermitConditions(this.props.draftPermitAmendment.permit_amendment_guid);
@@ -106,7 +123,8 @@ export class Conditions extends Component {
   };
 
   render = () => (
-    <>
+    <div>
+      <Button onClick={() => this.openConditionTourModal()}>Take Virtual Tour</Button>
       <Collapse>
         {this.props.permitConditionCategoryOptions.map((conditionCategory) => {
           const conditions = this.props.conditions.filter(
@@ -155,7 +173,7 @@ export class Conditions extends Component {
           );
         })}
       </Collapse>
-    </>
+    </div>
   );
 }
 

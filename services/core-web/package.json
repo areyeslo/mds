@@ -48,6 +48,7 @@
     "react-highlighter": "^0.4.3",
     "react-hot-loader": "^4.12.21",
     "react-iframe-resizer-super": "^0.2.2",
+    "react-joyride": "^2.2.1",
     "react-lottie": "^1.2.3",
     "react-redux": "^7.1.0",
     "react-redux-loading-bar": "^5.0.0",
