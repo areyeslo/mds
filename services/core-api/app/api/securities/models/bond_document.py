@@ -16,6 +16,7 @@ class BondDocument(MineDocument):
     class _ModelSchema(Base._ModelSchema):
         bond_document_type_code = FieldTemplate(field=fields.String, one_of='BondDocumentType')
         mine_document_guid = fields.UUID(dump_only=True)
+        bond_id = fields.Integer(dump_only=True)
 
     mine_document_guid = db.Column(
         UUID(as_uuid=True), db.ForeignKey('mine_document.mine_document_guid'), primary_key=True)

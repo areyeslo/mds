@@ -24,6 +24,7 @@ from app.api.utils.field_template import FieldTemplate
 from app.api.securities.models.bond import Bond
 from app.api.securities.models.bond_history import BondHistory
 from app.api.securities.models.bond_document import BondDocument
+from app.api.mines.documents.models.mine_document import MineDocument
 from app.api.securities.models.reclamation_invoice import ReclamationInvoice
 from app.api.securities.models.reclamation_invoice_document import ReclamationInvoiceDocument
 from app.api.mines.permits.permit_conditions.models.permit_conditions import PermitConditions
@@ -83,7 +84,7 @@ def setup_schema(Base, session):
     def setup_schema_fn():
         for class_ in ActivityDetailBase.__subclasses__() + [
                 Equipment, NOWApplicationDocumentXref, Bond, BondDocument, ReclamationInvoice,
-                ReclamationInvoiceDocument, BondHistory, PermitConditions
+                ReclamationInvoiceDocument, BondHistory, PermitConditions, MineDocument
         ] + sub_models.model_list:
             if hasattr(class_, "__tablename__") or getattr(class_, "__create_schema__", False):
                 try:
