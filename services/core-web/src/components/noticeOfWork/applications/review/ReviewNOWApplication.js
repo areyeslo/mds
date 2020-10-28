@@ -212,20 +212,25 @@ export const ReviewNOWApplication = (props) => {
         </Col>
         <Col md={12} sm={24}>
           <div className="field-title">
-            Permit Status
-            <NOWFieldOriginTooltip />
-          </div>
-          <Field id="" name="" component={RenderField} disabled />
-          <div className="field-title">
             Individual or Company/Organization?
             <NOWFieldOriginTooltip />
           </div>
-          <Field id="" name="" component={RenderField} disabled />
+          <Field
+            id="is_applicant_individual_or_company"
+            name="is_applicant_individual_or_company"
+            component={RenderField}
+            disabled={props.isViewMode}
+          />
           <div className="field-title">
             Relationship to Individual or Company/Organization?
             <NOWFieldOriginTooltip />
           </div>
-          <Field id="" name="" component={RenderField} disabled />
+          <Field
+            id="relationship_to_applicant"
+            name="relationship_to_applicant"
+            component={RenderField}
+            disabled={props.isViewMode}
+          />
           <div className="field-title">
             Description of Land
             <NOWOriginalValueTooltip
@@ -644,7 +649,12 @@ export const ReviewNOWApplication = (props) => {
             Total merchantable timber volume
             <NOWFieldOriginTooltip />
           </div>
-          <Field id="" name="" component={RenderField} disabled />
+          <Field
+            id="merchantable_timber_volume"
+            name="merchantable_timber_volume"
+            component={RenderField}
+            disabled={props.isViewMode}
+          />
         </Col>
       </Row>
       <br />
@@ -670,7 +680,12 @@ export const ReviewNOWApplication = (props) => {
             {renderApplicationInfo()}
           </ScrollContentWrapper>
           <ScrollContentWrapper id="contacts" title="Contacts">
-            <ReviewNOWContacts contacts={props.contacts} />
+            <ReviewNOWContacts
+              contacts={props.noticeOfWork.contacts}
+              isViewMode={props.isViewMode}
+              contactFormValues={props.contacts}
+              noticeOfWork={props.noticeOfWork}
+            />
           </ScrollContentWrapper>
           <ScrollContentWrapper id="access" title="Access">
             {renderAccess()}
@@ -744,8 +759,9 @@ export default compose(
   })),
   reduxForm({
     form: FORM.EDIT_NOTICE_OF_WORK,
-    touchOnChange: true,
+    touchOnChange: false,
     touchOnBlur: true,
     enableReinitialize: true,
+    onSubmit: () => {},
   })
 )(ReviewNOWApplication);
