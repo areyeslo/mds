@@ -157,6 +157,7 @@ export class ProcessPermit extends Component {
         letterCode: withdrawnLetterCode,
       },
     };
+
     const signature = this.props.noticeOfWork?.issuing_inspector?.signature;
 
     return this.props
@@ -175,7 +176,7 @@ export class ProcessPermit extends Component {
             initialValues,
             title: content[type].title,
             documentType: this.props.documentContextTemplate,
-            onSubmit: (values) => this.handleApplication(values, type),
+            onSubmit: (values) => this.handleApplication(values, content[type].statusCode),
             type,
             generateDocument: this.handleGenerateDocumentFormSubmit,
             noticeOfWork: this.props.noticeOfWork,
@@ -292,7 +293,7 @@ export class ProcessPermit extends Component {
         permitObj.auth_end_date = formatDate(values.auth_end_date);
         permitObj.issue_date = formatDate(values.issue_date);
 
-        this.handleGenerateDocumentFormSubmit(
+        return this.handleGenerateDocumentFormSubmit(
           this.props.documentContextTemplate,
           {
             ...permitObj,
