@@ -53,9 +53,7 @@ class NOWApplicationStatusResource(Resource, UserMixin):
             raise NotFound('No identity record for this application guid.')
 
         if now_application_identity.now_application_id is None:
-            raise NotImplemented(
-                'This application has not been imported. Please import an application before making changes.'
-            )
+            raise NotImplemented('The application must be imported before changes can be made.')
 
         if now_application_status_code is not None and now_application_identity.now_application.now_application_status_code != now_application_status_code:
             # Approved
