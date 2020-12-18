@@ -56,7 +56,12 @@ class Address(SoftDeleteMixin, AuditMixin, Base):
             if self.sub_division_code:
                 full += f' {self.sub_division_code}'
             if self.post_code:
-                full += f' {self.post_code}'
+                post_code = self.post_code
+                try:
+                    post_code = f'{post_code[:3]} {post_code[3:]}'
+                except:
+                    pass
+                full += f' {post_code}'
 
         return full.strip()
 

@@ -109,7 +109,8 @@ class NOWApplicationExportResource(Resource, UserMixin):
 
         def transform_contact(contact):
             def get_address(contact):
-                if  not contact.get('party', None) or not contact['party'].get('address', None) or not len(contact['party']['address']) > 0:
+                if not contact.get('party', None) or not contact['party'].get(
+                        'address', None) or not len(contact['party']['address']) > 0:
                     return ''
                 address = contact['party']['address'][0]
                 address_string = ''
@@ -128,7 +129,12 @@ class NOWApplicationExportResource(Resource, UserMixin):
                     if address['sub_division_code']:
                         address_string += f' {address["sub_division_code"]}'
                     if address['post_code']:
-                        address_string += f' {address["post_code"]}'
+                        post_code = address['post_code']
+                        try:
+                            post_code = f'{post_code[:3]} {post_code[3:]}'
+                        except:
+                            pass
+                        address_string += f' {post_code}'
 
                 return address_string.strip()
 
