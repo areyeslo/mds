@@ -26,11 +26,11 @@ export const RejectApplicationForm = (props) => (
     {props.noticeOfWork?.security_received_date && props.noticeOfWork?.security_adjustment && (
       <Alert
         message="Return Reclamation Securities"
-        description={`A Security adjustment of ${formatMoney(
+        description={`A security adjustment of ${formatMoney(
           props.noticeOfWork.security_adjustment
         )} was received on ${formatDate(
           props.noticeOfWork.security_received_date
-        )} for this application which needs to be returned to the applicant or moved to a new application by the applicant. Update this information before rejecting.`}
+        )} for this application and needs to be returned to the applicant or moved to a new application made by the applicant. Update this information before rejecting.`}
         type="error"
         showIcon
         style={{ textAlign: "left" }}
