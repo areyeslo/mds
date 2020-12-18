@@ -36,11 +36,11 @@ class NOWApplicationProgressResource(Resource, UserMixin):
 
         now_progress = None
         if existing_now_progress:
-            #RE Open existing date span - starting at original start time
+            # Re-open the existing date span, starting at its original start time
             existing_now_progress.end_date = None
             now_progress = existing_now_progress
         else:
-            #Create new datespan - starting now
+            # Create a new date span that starts now
             new_now_progress = NOWApplicationProgress.create(identity.now_application,
                                                              progress_status_code)
             now_progress = new_now_progress
@@ -63,8 +63,7 @@ class NOWApplicationProgressResource(Resource, UserMixin):
         identity = NOWApplicationIdentity.find_by_guid(application_guid)
         if not identity.now_application:
             raise NotFound(
-                'There was no notice of work application found with the provided now_application_guid.'
-            )
+                'No Notice of Work application found with the provided now_application_guid.')
         existing_now_progress = next(
             (p for p in identity.now_application.application_progress
              if p.application_progress_status_code == application_progress_status_code), None)

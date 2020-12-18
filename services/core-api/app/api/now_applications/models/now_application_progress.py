@@ -1,17 +1,16 @@
-from sqlalchemy.dialects.postgresql import UUID
+import dateutil.parser
+
 from sqlalchemy.schema import FetchedValue
 from sqlalchemy.orm import validates
 from datetime import datetime
-from sqlalchemy.ext.associationproxy import association_proxy
-from app.extensions import db
-import dateutil.parser
 
+from app.extensions import db
 from app.api.utils.models_mixins import Base, AuditMixin
 from app.api.utils.include.user_info import User
 
 
 class NOWApplicationProgress(Base, AuditMixin):
-    __tablename__ = "now_application_progress"
+    __tablename__ = 'now_application_progress'
 
     application_progress_id = db.Column(db.Integer, primary_key=True, server_default=FetchedValue())
     now_application_id = db.Column(db.Integer, db.ForeignKey('now_application.now_application_id'))
