@@ -23,3 +23,5 @@
 .vimrc
 .nvimrc
 .tern-port
+
+cypress.env.json
