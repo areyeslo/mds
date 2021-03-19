@@ -11,6 +11,7 @@ class ArticleActCode(Base):
     description = db.Column(db.String, nullable=False)
     effective_date = db.Column(db.DateTime, nullable=False, server_default=FetchedValue())
     expiry_date = db.Column(db.DateTime)
+    # TODO: Shouldn't this use AuditMixin instead of specifying this column? Refactor this model to use AuditMixin.
     update_timestamp = db.Column(db.DateTime,
                                  nullable=False,
                                  default=datetime.utcnow,
