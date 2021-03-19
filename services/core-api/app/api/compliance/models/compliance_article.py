@@ -17,7 +17,8 @@ class ComplianceArticle(AuditMixin, Base):
     description = db.Column(db.String, nullable=False)
     long_description = db.Column(db.String, nullable=False)
     effective_date = db.Column(db.DateTime, nullable=False, server_default=FetchedValue())
-    expiry_date = db.Column(db.DateTime)
+    # TODO: Should we remove this default of '9999-12-31'::date?
+    expiry_date = db.Column(db.DateTime, server_default=FetchedValue())
 
     article_act = db.relationship('ArticleActCode')
 
