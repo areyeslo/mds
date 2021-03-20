@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { PropTypes } from "prop-types";
 import { isEmpty } from "lodash";
 import { Link } from "react-router-dom";
-import { formatDate } from "@common/utils/helpers";
+import { formatDateFromTimestamp } from "@common/utils/helpers";
 import { Badge } from "antd";
 import CustomPropTypes from "@/customPropTypes";
 import {
@@ -65,7 +65,7 @@ export const NOWProgressStatus = (props) => {
                 "#progress-tracking"
               )}
             >
-              {formatDate(props.progress[props.tab].start_date)}/
+              {formatDateFromTimestamp(props.progress[props.tab].start_date)}/
               {props.progress[props.tab].duration || "0 Days"}
             </Link>
           </p>
@@ -91,7 +91,7 @@ export const NOWProgressStatus = (props) => {
                 "#progress-tracking"
               )}
             >
-              {formatDate(props.progress[props.tab].start_date)}/
+              {formatDateFromTimestamp(props.progress[props.tab].start_date)}/
               {props.progress[props.tab].duration || "0 Days"}
             </Link>
           </p>
@@ -101,7 +101,7 @@ export const NOWProgressStatus = (props) => {
         <>
           {props.noticeOfWork.last_updated_date && (
             <p className="small-p">
-              Last Updated: {formatDate(props.noticeOfWork.last_updated_date)}
+              Last Updated: {formatDateFromTimestamp(props.noticeOfWork.last_updated_date)}
             </p>
           )}
           {props.noticeOfWork.last_updated_by && (
