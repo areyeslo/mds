@@ -17,7 +17,7 @@ class NOWApplicationProgress(Base, AuditMixin):
     now_application_id = db.Column(db.Integer, db.ForeignKey('now_application.now_application_id'))
 
     application_progress_status_code = db.Column(db.String, nullable=False)
-    start_date = db.Column(db.DateTime, nullable=False)
+    start_date = db.Column(db.DateTime, nullable=False, server_default=FetchedValue())
     end_date = db.Column(db.DateTime)
     created_by = db.Column(db.String, nullable=False)
     active_ind = db.Column(db.Boolean, nullable=False, server_default=FetchedValue())
