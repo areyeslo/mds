@@ -64,11 +64,15 @@ export const createLabelHash = (arr) =>
   arr.reduce((map, { value, label }) => ({ [value]: label, ...map }), {});
 
 // Function to format an API date string to human readable
-export const formatDate = (dateString) =>
-  dateString && dateString !== "None" && moment(dateString, "YYYY-MM-DD").format("MMM DD YYYY");
-
-export const formatDateFromTimestamp = (timeStamp) =>
-  timeStamp && timeStamp !== "None" && moment(timeStamp).format("MMM DD YYYY");
+export const formatDate = (dateString) => {
+  if (dateString && dateString !== "None") {
+    if (dateString.length === 10) {
+      return moment(dateString, "YYYY-MM-DD").format("MMM DD YYYY");
+    } else {
+      return moment(dateString).format("MMM DD YYYY");
+    }
+  }
+};
 
 export const formatTime = (timeStamp) => timeStamp && moment(timeStamp).format("h:mm a");
 
