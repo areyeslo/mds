@@ -10,7 +10,8 @@ const setupProps = () => {
     input: '',
     label: '',
     placeholder: 'yyyy-mm-dd',
-    onChange: jest.fn((date, dateString) => dateString),
+    onChange: jest.fn((date) => date),
+    onBlur: jest.fn(() => {}),
     meta: {
       touched: false,
       error: false,
