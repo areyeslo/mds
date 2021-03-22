@@ -228,7 +228,7 @@ exports[`MineReportTable renders properly 1`] = `
         "openEditReportModal": undefined,
         "permit_guid": "N/A",
         "permit_number": undefined,
-        "received_date": null,
+        "received_date": undefined,
         "report": Object {
           "created_by_idir": "idir\\\\TEST",
           "due_date": "2020-03-31",

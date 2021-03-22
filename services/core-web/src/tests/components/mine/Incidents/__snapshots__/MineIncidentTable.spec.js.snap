@@ -141,7 +141,7 @@ exports[`MineIncidentTable renders properly 1`] = `
           "reported_timestamp": "2019-03-17T17:42:37+00:00",
         },
         "incident_status": "N/A",
-        "incident_timestamp": "Apr 06 2019",
+        "incident_timestamp": "Apr 05 2019",
         "incident_types": Array [],
         "key": "dc101155-de3e-4f37-8303-eb6a6d2d5866",
         "mine_incident_report_no": "2019-70",
