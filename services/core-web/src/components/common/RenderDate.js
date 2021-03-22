@@ -43,11 +43,12 @@ const RenderDate = (props) => (
       id={props.id}
       {...props.input}
       placeholder={props.placeholder}
-      onChange={(date, dateString) => props.input.onChange(dateString || null)}
+      onChange={(date, dateString) => props.input.onChange(date || null)}
       value={props.input.value ? moment(props.input.value) : null}
       showTime={props.showTime && { format: "HH:mm" }}
-      format={props.showTime && "YYYY-MM-DD HH:mm"}
+      // format={props.showTime && "YYYY-MM-DD HH:mm"}
     />
+    {/* 2021-03-17T11:49:00 */}
   </Form.Item>
 );
 
