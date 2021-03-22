@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Field, getFormValues, reduxForm } from "redux-form";
-import { compose, bindActionCreators } from "redux";
-import { connect } from "react-redux";
+import { Field, reduxForm } from "redux-form";
 import { Form } from "@ant-design/compatible";
 import "@ant-design/compatible/assets/index.css";
 import { Button, Col, Row, Popconfirm } from "antd";
@@ -79,10 +77,6 @@ export class BondForm extends Component {
       filesToDelete: [mineDocumentGuid, ...prevState.filesToDelete],
     }));
   };
-
-  componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
-  }
 
   render() {
     const filesUploaded = this.state.uploadedFiles.length >= 1;
@@ -433,17 +427,8 @@ export class BondForm extends Component {
 BondForm.propTypes = propTypes;
 BondForm.defaultProps = defaultProps;
 
-const mapStateToProps = (state) => ({
-  formValues: getFormValues(FORM.ADD_BOND)(state),
-});
-
-const mapDispatchToProps = (dispatch) => bindActionCreators({}, dispatch);
-
-export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  reduxForm({
-    form: FORM.ADD_BOND,
-    touchOnBlur: false,
-    onSubmitSuccess: resetForm(FORM.ADD_BOND),
-  })
-)(BondForm);
+export default reduxForm({
+  form: FORM.ADD_BOND,
+  touchOnBlur: false,
+  onSubmitSuccess: resetForm(FORM.ADD_BOND),
+})(BondForm);
