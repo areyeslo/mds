@@ -43,7 +43,8 @@ const RenderDate = (props) => (
       id={props.id}
       {...props.input}
       placeholder={props.placeholder}
-      onChange={(date, dateString) => props.input.onChange(dateString || null)}
+      onChange={(date) => props.input.onChange(date || null)}
+      onBlur={props.input.onChange(props.input.value ? moment(props.input.value) : null)}
       value={props.input.value ? moment(props.input.value) : null}
       showTime={props.showTime && { format: "HH:mm" }}
       format={props.showTime && "YYYY-MM-DD HH:mm"}
