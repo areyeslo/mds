@@ -1,10 +1,11 @@
-name: Deploy to dev workspace
+name: Deploy to pr-based workspace
 
-# TODO: change to workflow_run to create wait for build+test
 on:
-  push:
+  pull_request:
+    paths:
+      - "!**/README.md"
     branches:
-      - main
+      - "feature/*"
 
 env:
   IMAGE_URI: ${{ secrets.AWS_ECR_URI }}
@@ -12,11 +13,11 @@ env:
   TG_VERSION: 0.28.7
   TG_SRC_PATH: terraform
   TFC_WORKSPACE: dev
-  TAG_ENV: dev
+  TAG_ENV: pr-${{ github.event.number }}
 
 jobs:
-  infra-plan-dev:
-    name: infra-plan-dev
+  infra-plan-pr:
+    name: infra-plan-pr
     runs-on: ubuntu-20.04
 
     steps:
@@ -55,10 +56,10 @@ jobs:
         run: exit 1
 
   ## waits for plan and runs apply
-  infra-deploy-dev:
-    name: infra-deploy-dev
+  infra-deploy-pr:
+    name: infra-deploy-pr
     runs-on: ubuntu-20.04
-    needs: infra-plan-dev
+    needs: infra-plan-pr
 
     steps:
       - name: Check out the repo

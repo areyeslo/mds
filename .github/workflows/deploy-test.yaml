@@ -1,22 +1,23 @@
-name: Deploy to dev workspace
+name: Deploy to test workspace
 
-# TODO: change to workflow_run to create wait for build+test
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+  # manual
 
 env:
   IMAGE_URI: ${{ secrets.AWS_ECR_URI }}
   TF_VERSION: 0.14.7
   TG_VERSION: 0.28.7
   TG_SRC_PATH: terraform
-  TFC_WORKSPACE: dev
-  TAG_ENV: dev
+  TFC_WORKSPACE: test
+  TAG_ENV: test
 
 jobs:
-  infra-plan-dev:
-    name: infra-plan-dev
+  infra-plan-test:
+    name: infra-plan-test
     runs-on: ubuntu-20.04
 
     steps:
@@ -55,10 +56,10 @@ jobs:
         run: exit 1
 
   ## waits for plan and runs apply
-  infra-deploy-dev:
-    name: infra-deploy-dev
+  infra-deploy-test:
+    name: infra-deploy-test
     runs-on: ubuntu-20.04
-    needs: infra-plan-dev
+    needs: infra-plan-test
 
     steps:
       - name: Check out the repo

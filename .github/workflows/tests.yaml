@@ -6,6 +6,7 @@ on:
       - ".github/workflows/frontend-tests.yaml"
       - "services/core-web/**"
       - "!**/README.md"
+  push:
 
 jobs:
   fe-test:
@@ -14,7 +15,7 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-    
+
       - name: Run frontend tests
         id: results
         run: |

@@ -9,6 +9,10 @@ variable "target_env" {
   description = "AWS workload account env (e.g. dev, test, prod, sandbox, unclass)"
 }
 
+variable "image_tag" {
+  description = "defines which image will be pulled for services"
+}
+
 variable "target_aws_account_id" {
   description = "AWS workload account id"
 }
@@ -103,7 +107,7 @@ variable "env_s3" {
 
 variable "service_names" {
   description = "List of service names to use as subdomains"
-  default     = ["minesdigitalservices", "mds"]
+  default     = ["minesdigitalservices"]
   type        = list(string)
 }
 
