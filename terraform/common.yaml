@@ -1,0 +1,7 @@
+tfc_hostname: app.terraform.io
+tfc_organization: bcgov
+license_plate: bth36g
+service_name: minesdigitalservices
+ecrs:
+  - mds-web
+  - mds-api

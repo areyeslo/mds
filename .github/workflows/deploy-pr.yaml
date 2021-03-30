@@ -1,0 +1,85 @@
+name: Deploy to pr-based workspace
+
+on:
+  pull_request:
+    paths:
+      - "!**/README.md"
+    branches:
+      - "feature/*"
+
+env:
+  IMAGE_URI: ${{ secrets.AWS_ECR_URI }}
+  TF_VERSION: 0.14.7
+  TG_VERSION: 0.28.7
+  TG_SRC_PATH: terraform
+  TFC_WORKSPACE: dev
+  TAG_ENV: pr-${{ github.event.number }}
+
+jobs:
+  infra-plan-pr:
+    name: infra-plan-pr
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.sha }}
+
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          cli_config_credentials_token: ${{ secrets.TFC_TEAM_TOKEN }}
+
+      - uses: peter-murray/terragrunt-github-action@v1.0.0
+        with:
+          terragrunt_version: ${{ env.TG_VERSION }}
+
+      - name: Terragrunt Plan
+        id: tg_plan
+        working-directory: ${{ env.TG_SRC_PATH }}/${{ env.TFC_WORKSPACE }}
+        env:
+          ECR_TAG: ${{ env.TAG_ENV }}
+          ECR_ARN: ${{ env.IMAGE_URI }}
+          TF_CLI_ARGS: -no-color
+        run: terragrunt run-all plan --terragrunt-non-interactive | tee /tmp/tg_plan
+        continue-on-error: true
+
+      - name: Get Terraform Plan Output
+        id: plan
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: /tmp/tg_plan
+
+      - name: Terragrunt Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+  ## waits for plan and runs apply
+  infra-deploy-pr:
+    name: infra-deploy-pr
+    runs-on: ubuntu-20.04
+    needs: infra-plan-pr
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.sha }}
+
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          cli_config_credentials_token: ${{ secrets.TFC_TEAM_TOKEN }}
+
+      - uses: peter-murray/terragrunt-github-action@v1.0.0
+        with:
+          terragrunt_version: ${{ env.TG_VERSION }}
+
+      - name: Terragrunt Apply
+        working-directory: ${{ env.TG_SRC_PATH }}/${{ env.TFC_WORKSPACE }}
+        env:
+          ECR_TAG: ${{ env.TAG_ENV }}
+          ECR_ARN: ${{ env.IMAGE_URI }}
+          AWS_ACCOUNTS_ECR_READ_ACCESS: ${{ secrets.AWS_ACCOUNTS_ECR_READ_ACCESS }}
+        run: terragrunt apply-all --terragrunt-non-interactive
