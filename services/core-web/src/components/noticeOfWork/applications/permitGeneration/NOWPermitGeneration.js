@@ -75,11 +75,13 @@ const regionHash = {
 
 const getDocumentsMetadataInitialValues = (documents, guid_name) => {
   const initialValues = {};
-  documents?.map((doc) => {
-    initialValues[`${doc[guid_name]}_preamble_title`] = doc.preamble_title;
-    initialValues[`${doc[guid_name]}_preamble_author`] = doc.preamble_author;
-    initialValues[`${doc[guid_name]}_preamble_date`] = doc.preamble_date;
-  });
+  // eslint-disable-next-line no-unused-expressions
+  !isEmpty(documents) &&
+    documents.forEach((doc) => {
+      initialValues[`${doc[guid_name]}_preamble_title`] = doc.preamble_title;
+      initialValues[`${doc[guid_name]}_preamble_author`] = doc.preamble_author;
+      initialValues[`${doc[guid_name]}_preamble_date`] = doc.preamble_date;
+    });
   return initialValues;
 };
 
@@ -298,12 +300,15 @@ export class NOWPermitGeneration extends Component {
       }
     }
 
-    this.props.handleGenerateDocumentFormSubmit(this.props.documentType, {
-      ...newValues,
-      auth_end_date: formatDate(this.props.formValues.auth_end_date),
-      application_dated: formatDate(newValues.application_date),
-      final_application_package: this.getFinalApplicationPackage(this.props.noticeOfWork),
-    });
+    this.setState({ downloadingDraft: true });
+    return this.props
+      .handleGenerateDocumentFormSubmit(this.props.documentType, {
+        ...newValues,
+        auth_end_date: formatDate(this.props.formValues.auth_end_date),
+        application_dated: formatDate(newValues.application_date),
+        final_application_package: this.getFinalApplicationPackage(this.props.noticeOfWork),
+      })
+      .finally(() => this.setState({ downloadingDraft: false }));
   };
 
   handleCancelDraftEdit = () => {
@@ -323,10 +328,12 @@ export class NOWPermitGeneration extends Component {
         const fieldIdParts = key.split(/_(.+)/);
         const guid = fieldIdParts[0];
         const fieldName = fieldIdParts[1];
-        if (!(guid in allFileMetadata)) {
-          allFileMetadata[guid] = {};
+        if (guid && guid !== "null") {
+          if (!(guid in allFileMetadata)) {
+            allFileMetadata[guid] = {};
+          }
+          allFileMetadata[guid][fieldName] = value;
         }
-        allFileMetadata[guid][fieldName] = value;
       }
       return allFileMetadata;
     };
@@ -404,6 +411,7 @@ export class NOWPermitGeneration extends Component {
                   className="full-mobile"
                   type="secondary"
                   onClick={this.handlePermitGenSubmit}
+                  loading={this.state.downloadingDraft}
                   disabled={isEmpty(this.state.permittee)}
                   title={
                     isEmpty(this.state.permittee)
