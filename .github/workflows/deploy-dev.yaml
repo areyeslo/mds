@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+  # test push
 
 env:
   IMAGE_URI: ${{ secrets.AWS_ECR_URI }}
