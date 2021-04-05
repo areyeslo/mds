@@ -116,3 +116,43 @@ variable "alb_name" {
   default     = "default"
   type        = string
 }
+
+variable "rds_gb_storage" {
+  description = ""
+  default = 5
+}
+
+variable "rds_engine" {
+  description = "Database engine to use"
+  default = "postgres"
+}
+
+variable "rds_engine_version" {
+  description = "What version of the engine to use (IAM auth supported only on <=12.x)"
+  default = "13"
+}
+
+variable "rds_instance_class" {
+  description = "Database instance type"
+  default = "db.m6g.large"
+}
+
+variable "rds_db_name" {
+  description = "Name of the database"
+  default = "mds"
+}
+
+variable "rds_username" {
+  description = "Name of the user for the database"
+  type = "string"
+}
+
+variable "rds_password" {
+  description = "Basic auth for the database"
+  type = "string"
+}
+
+variable "rds_port" {
+  description = "Port to serve db on"
+  default = 5432
+}

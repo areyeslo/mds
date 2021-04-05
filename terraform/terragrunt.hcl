@@ -7,6 +7,8 @@ locals {
   environment      = reverse(split("/", get_terragrunt_dir()))[0]
   ecr_arn          = get_env("ECR_ARN", "")
   ecr_tag          = get_env("ECR_TAG", "dev")
+  rds_username     = get_env("AWS_RDS_ADMIN_USER", "")
+  rds_password     = get_env("AWS_RDS_ADMIN_PASSWORD", "")
 }
 
 generate "remote_state" {
@@ -33,5 +35,7 @@ generate "tfvars" {
 ecr_arn = "${local.ecr_arn}"
 image_tag = "${local.ecr_tag}"
 service_names = ["${local.service_name}-${local.ecr_tag}"]
+rds_username = "${local.rds_username}"
+rds_password = "${local.rds_password}"
 EOF
 }
