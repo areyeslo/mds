@@ -41,6 +41,8 @@ jobs:
         env:
           ECR_TAG: ${{ env.TAG_ENV }}
           ECR_ARN: ${{ env.IMAGE_URI }}
+          AWS_RDS_ADMIN_USER: ${{ secrets.AWS_RDS_ADMIN_USER }}
+          AWS_RDS_ADMIN_PASSWORD: ${{ secrets.AWS_RDS_ADMIN_PASSWORD }}
           TF_CLI_ARGS: -no-color
         run: terragrunt run-all plan --terragrunt-non-interactive | tee /tmp/tg_plan
         continue-on-error: true
@@ -82,4 +84,6 @@ jobs:
           ECR_TAG: ${{ env.TAG_ENV }}
           ECR_ARN: ${{ env.IMAGE_URI }}
           AWS_ACCOUNTS_ECR_READ_ACCESS: ${{ secrets.AWS_ACCOUNTS_ECR_READ_ACCESS }}
+          AWS_RDS_ADMIN_USER: ${{ secrets.AWS_RDS_ADMIN_USER }}
+          AWS_RDS_ADMIN_PASSWORD: ${{ secrets.AWS_RDS_ADMIN_PASSWORD }}
         run: terragrunt apply-all --terragrunt-non-interactive
