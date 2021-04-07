@@ -5,3 +5,7 @@ service_name: minesdigitalservices
 ecrs:
   - mds-web
   - mds-api
+env_buckets:
+  dev: mds-env-dev-cacentral1-xbvyjgyklltkj9
+  test: mds-env-test
+  prod: mds-env-prod

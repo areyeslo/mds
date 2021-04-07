@@ -102,7 +102,7 @@ variable "common_tags" {
 
 variable "env_s3" {
   description = "Bucket containing environment variables for environment to be deployed"
-  default     = "mds-env-dev-cacentral1-xbvyjgyklltkj9"
+  type     = string
 }
 
 variable "service_names" {
@@ -144,12 +144,12 @@ variable "rds_db_name" {
 
 variable "rds_username" {
   description = "Name of the user for the database"
-  type = "string"
+  type = string
 }
 
 variable "rds_password" {
   description = "Basic auth for the database"
-  type = "string"
+  type = string
 }
 
 variable "rds_port" {

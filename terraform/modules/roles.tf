@@ -62,7 +62,7 @@ resource "aws_iam_role_policy" "ecs_task_execution_env_read" {
           "s3:GetObject"
         ],
         "Resource": [
-          "arn:aws:s3:::mds-env-dev-cacentral1-xbvyjgyklltkj9/*"
+          "arn:aws:s3:::${var.env_s3}/*"
         ]
       },
       {
@@ -71,7 +71,7 @@ resource "aws_iam_role_policy" "ecs_task_execution_env_read" {
           "s3:GetBucketLocation"
         ],
         "Resource": [
-          "arn:aws:s3:::mds-env-dev-cacentral1-xbvyjgyklltkj9"
+          "arn:aws:s3:::${var.env_s3}"
         ]
       }
     ]
