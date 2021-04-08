@@ -37,50 +37,13 @@ variable "az_count" {
   default     = "2"
 }
 
-variable "app_name" {
-  description = "Name of the application"
-  type        = string
-  default     = "minesdigitalservices"
-}
-
 variable "ecr_arn" {
   description = "The base URI of the ECR for looking up image repos"
   type = string
 }
 
-variable "mds_web_repo" {
-  description = "Specifies the repo to reference for mds-web images"
-  type        = string
-  default     = "mds-web"
-}
-
-variable "app_port" {
-  description = "Port exposed by the docker image to redirect traffic to"
-  default     = 80
-}
-
-variable "app_count" {
-  description = "Number of docker containers to run"
-  default     = 2
-}
-
-variable "container_name" {
-  description = "Container name"
-  default     = "app"
-}
-
 variable "health_check_path" {
   default = "/"
-}
-
-variable "fargate_cpu" {
-  description = "Fargate instance CPU units to provision (1 vCPU = 1024 CPU units)"
-  default     = 2048
-}
-
-variable "fargate_memory" {
-  description = "Fargate instance memory to provision (in MiB)"
-  default     = 4096
 }
 
 variable "budget_amount" {
@@ -155,4 +118,8 @@ variable "rds_password" {
 variable "rds_port" {
   description = "Port to serve db on"
   default = 5432
+}
+
+variable "configs" {
+  description = "Contains a mapping of service configurations"
 }

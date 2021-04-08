@@ -3,7 +3,7 @@
 resource "aws_appautoscaling_target" "target" {
   count              = local.create_ecs_service
   service_namespace  = "ecs"
-  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.main[count.index].name}"
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.web[count.index].name}"
   scalable_dimension = "ecs:service:DesiredCount"
   min_capacity       = 1
   max_capacity       = 6
@@ -13,8 +13,8 @@ resource "aws_appautoscaling_target" "target" {
 resource "aws_appautoscaling_policy" "up" {
   count              = local.create_ecs_service
   name               = "mds_scale_up"
-  service_namespace  = "ecs"
-  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.main[count.index].name}"
+  service_namespace  = aws_appautoscaling_target.target[count.index].service_namespace
+  resource_id        = aws_appautoscaling_target.target[count.index].resource_id
   scalable_dimension = "ecs:service:DesiredCount"
 
   step_scaling_policy_configuration {
@@ -35,8 +35,8 @@ resource "aws_appautoscaling_policy" "up" {
 resource "aws_appautoscaling_policy" "down" {
   count              = local.create_ecs_service
   name               = "mds_scale_down"
-  service_namespace  = "ecs"
-  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.main[count.index].name}"
+  service_namespace  = aws_appautoscaling_target.target[count.index].service_namespace
+  resource_id        = aws_appautoscaling_target.target[count.index].resource_id
   scalable_dimension = "ecs:service:DesiredCount"
 
   step_scaling_policy_configuration {
@@ -67,7 +67,7 @@ resource "aws_cloudwatch_metric_alarm" "service_cpu_high" {
 
   dimensions = {
     ClusterName = aws_ecs_cluster.main.name
-    ServiceName = aws_ecs_service.main[count.index].name
+    ServiceName = aws_ecs_service.web[count.index].name
   }
 
   alarm_actions = [aws_appautoscaling_policy.up[count.index].arn]
@@ -89,7 +89,7 @@ resource "aws_cloudwatch_metric_alarm" "service_cpu_low" {
 
   dimensions = {
     ClusterName = aws_ecs_cluster.main.name
-    ServiceName = aws_ecs_service.main[count.index].name
+    ServiceName = aws_ecs_service.web[count.index].name
   }
 
   alarm_actions = [aws_appautoscaling_policy.down[count.index].arn]
