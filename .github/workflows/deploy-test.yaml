@@ -19,6 +19,7 @@ jobs:
   infra-plan-test:
     name: infra-plan-test
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
 
     steps:
       - name: Check out the repo
@@ -60,6 +61,7 @@ jobs:
     name: infra-deploy-test
     runs-on: ubuntu-20.04
     needs: infra-plan-test
+    timeout-minutes: 20
 
     steps:
       - name: Check out the repo

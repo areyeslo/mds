@@ -19,6 +19,7 @@ jobs:
   infra-plan-dev:
     name: infra-plan-dev
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
 
     steps:
       - name: Check out the repo
@@ -62,6 +63,7 @@ jobs:
     name: infra-deploy-dev
     runs-on: ubuntu-20.04
     needs: infra-plan-dev
+    timeout-minutes: 20
 
     steps:
       - name: Check out the repo
