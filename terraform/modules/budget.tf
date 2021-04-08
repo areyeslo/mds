@@ -17,7 +17,7 @@ resource "aws_budgets_budget" "cost" {
   }
 
   cost_filters = {
-    TagKeyValue = "user:Project$MDS Frontend Spike"
+    TagKeyValue = "user:Project$MDS"
   }
 }
 

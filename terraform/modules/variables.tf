@@ -48,7 +48,7 @@ variable "health_check_path" {
 
 variable "budget_amount" {
   description = "The amount of spend for the budget. Example: enter 100 to represent $100"
-  default     = "100.0"
+  default     = "600.0"
 }
 
 variable "budget_tag" {
