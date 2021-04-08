@@ -57,3 +57,28 @@ resource "aws_security_group" "mds_db" {
 
   tags = local.common_tags
 }
+
+resource "aws_security_group" "mds_redis" {
+  name = "mds_redis"
+
+  description = "Elasticache Redis"
+  vpc_id = module.network.aws_vpc.id
+
+  # Only redis in
+  ingress {
+    from_port = 6379
+    to_port = 6379
+    protocol = "tcp"
+    security_groups = [data.aws_security_group.data.id]
+  }
+
+  # Allow all outbound traffic.
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.common_tags
+}

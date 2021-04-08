@@ -11,3 +11,8 @@ resource "aws_db_subnet_group" "mds_db_subnet_group" {
 
   tags = local.common_tags
 }
+
+resource "aws_elasticache_subnet_group" "mds_redis_subnet_group" {
+  name       = "mds-redis-group"
+  subnet_ids = module.network.aws_subnet_ids.data.ids
+}
