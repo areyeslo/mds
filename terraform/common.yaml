@@ -21,6 +21,14 @@ configs:
       replicas: 3
       port: 80
       container_name: mds-web
+    api:
+      ecr_repo: mds-api
+      cpu: 512
+      memory: 1024
+      replicas: 3
+      port: 5000
+      container_name: mds-api
+
   test:
     web:
       ecr_repo: mds-web
@@ -29,6 +37,14 @@ configs:
       replicas: 3
       port: 80
       container_name: mds-web
+    api:
+      ecr_repo: mds-api
+      cpu: 512
+      memory: 1024
+      replicas: 3
+      port: 5000
+      container_name: mds-api
+
   prod:
     web:
       ecr_repo: mds-web
@@ -37,3 +53,10 @@ configs:
       replicas: 3
       port: 80
       container_name: mds-web
+    api:
+      ecr_repo: mds-api
+      cpu: 512
+      memory: 1024
+      replicas: 3
+      port: 5000
+      container_name: mds-api
