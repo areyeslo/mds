@@ -1,24 +1,24 @@
-resource "aws_ecs_task_definition" "web" {
+resource "aws_ecs_task_definition" "api" {
   count                    = local.create_ecs_service
-  family                   = "mds-task"
+  family                   = "${var.configs["api"]["container_name"]}-task"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.mds_app_container_role.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = var.configs["web"]["cpu"]
-  memory                   = var.configs["web"]["memory"]
+  cpu                      = var.configs["api"]["cpu"]
+  memory                   = var.configs["api"]["memory"]
   tags                     = local.common_tags
   container_definitions = jsonencode([
     {
       essential   = true
-      name        = var.configs["web"]["container_name"]
-      image       = "${var.ecr_arn}${var.configs["web"]["ecr_repo"]}:${var.image_tag}"
+      name        = var.configs["api"]["container_name"]
+      image       = "${var.ecr_arn}${var.configs["api"]["ecr_repo"]}:${var.image_tag}"
       networkMode = "awsvpc"
       portMappings = [
         {
           protocol      = "tcp"
-          containerPort = var.configs["web"]["port"]
-          hostPort      = var.configs["web"]["port"]
+          containerPort = var.configs["api"]["port"]
+          hostPort      = var.configs["api"]["port"]
         }
       ]
       environment = [
@@ -29,7 +29,7 @@ resource "aws_ecs_task_definition" "web" {
       ]
       environmentFiles = [
         {
-          value = "arn:aws:s3:::${var.env_s3}/core_frontend_${var.target_env}.env",
+          value = "arn:aws:s3:::${var.env_s3}/core_backend_${var.target_env}.env",
           type  = "s3"
         }
       ]
@@ -37,7 +37,7 @@ resource "aws_ecs_task_definition" "web" {
         logDriver = "awslogs"
         options = {
           awslogs-create-group  = "true"
-          awslogs-group         = "/ecs/${var.configs["web"]["container_name"]}"
+          awslogs-group         = "/ecs/${var.configs["api"]["container_name"]}"
           awslogs-region        = var.aws_region
           awslogs-stream-prefix = "ecs"
         }
@@ -48,12 +48,12 @@ resource "aws_ecs_task_definition" "web" {
   ])
 }
 
-resource "aws_ecs_service" "web" {
+resource "aws_ecs_service" "api" {
   count                             = local.create_ecs_service
-  name                              = "${var.configs["web"]["container_name"]}-service" # pipeline depends on this naming schema
+  name                              = "${var.configs["api"]["container_name"]}-service" # pipeline depends on this naming schema
   cluster                           = aws_ecs_cluster.main.id
-  task_definition                   = aws_ecs_task_definition.web[count.index].arn
-  desired_count                     = var.configs["web"]["replicas"]
+  task_definition                   = aws_ecs_task_definition.api[count.index].arn
+  desired_count                     = var.configs["api"]["replicas"]
   enable_ecs_managed_tags           = true
   propagate_tags                    = "TASK_DEFINITION"
   health_check_grace_period_seconds = 60
@@ -76,8 +76,8 @@ resource "aws_ecs_service" "web" {
 
   load_balancer {
     target_group_arn = aws_alb_target_group.app.id
-    container_name   = var.configs["web"]["container_name"]
-    container_port   = var.configs["web"]["port"]
+    container_name   = var.configs["api"]["container_name"]
+    container_port   = var.configs["api"]["port"]
   }
 
   depends_on = [data.aws_alb_listener.front_end, aws_iam_role_policy_attachment.ecs_task_execution_role]
