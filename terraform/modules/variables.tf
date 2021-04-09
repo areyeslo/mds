@@ -59,7 +59,7 @@ variable "budget_tag" {
 variable "common_tags" {
   description = "Common tags for created resources"
   default = {
-    Application = "MDS Spike"
+    Application = "MDS"
   }
 }
 
