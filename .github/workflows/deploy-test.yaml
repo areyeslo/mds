@@ -3,7 +3,9 @@ name: Deploy to test workspace
 on:
   push:
     branches:
-      - placeholder
+      - main
+    paths:
+      - terraform/**
   workflow_dispatch:
   # manual
 

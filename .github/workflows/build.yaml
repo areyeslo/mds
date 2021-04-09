@@ -2,8 +2,6 @@ name: Build and push to AWS
 
 on:
   push:
-    paths:
-      - "!**/README.md"
     branches:
       - "main"
 

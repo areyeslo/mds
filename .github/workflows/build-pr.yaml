@@ -2,8 +2,6 @@ name: Build PR and push to AWS
 
 on:
   pull_request:
-    paths:
-      - "!**/README.md"
     branches:
       - "feature/*"
 
@@ -64,3 +62,8 @@ jobs:
           context: ${{ matrix.service }}
           push: true
           tags: ${{ env.IMAGE_URI }}${{ matrix.repo }}:${{ github.sha }}, ${{ env.IMAGE_URI }}${{ matrix.repo }}:${{ env.TAG_ENV }}
+
+      - name: Update service tasks
+        if: ${{ success() }}
+        run: |
+          aws ecs update-service --cluster=mds-cluster --service=${{ matrix.repo }}-service --force-new-deployment

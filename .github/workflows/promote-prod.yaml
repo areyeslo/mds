@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   IMAGE_URI: ${{ secrets.AWS_ECR_URI }}
@@ -21,13 +22,10 @@ jobs:
         include:
           - repo: mds-web
           - repo: mds-api
+    environment:
+      name: production
 
     steps:
-      # This is purely to demo promotion - we cant use workflow_run since this is not on the default branch
-      - name: temp sleep to wait for build
-        run: |
-          sleep 90
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1.5.8
         with:
@@ -49,3 +47,8 @@ jobs:
           docker tag ${{ env.IMAGE_URI }}${{ matrix.repo }}:${{ env.TAG_ENV }} ${{ env.IMAGE_URI }}${{ matrix.repo }}:${{ env.TAG_PROMOTE }}
           docker push ${{ env.IMAGE_URI }}${{ matrix.repo }} --all-tags
         continue-on-error: true
+
+      - name: Update service tasks
+        if: ${{ success() }}
+        run: |
+          aws ecs update-service --cluster=mds-cluster --service=${{ matrix.repo }}-service --force-new-deployment
