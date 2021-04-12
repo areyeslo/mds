@@ -89,7 +89,7 @@ jobs:
         env:
           ECR_TAG: ${{ env.TAG_ENV }}
           ECR_ARN: ${{ env.IMAGE_URI }}
-          AWS_ACCOUNTS_ECR_READ_ACCESS: ${{ secrets.AWS_ACCOUNTS_ECR_READ_ACCESS }}
           AWS_RDS_ADMIN_USER: ${{ secrets.AWS_RDS_ADMIN_USER }}
           AWS_RDS_ADMIN_PASSWORD: ${{ secrets.AWS_RDS_ADMIN_PASSWORD }}
+          AWS_ACCOUNTS_ECR_READ_ACCESS: ${{ secrets.AWS_ACCOUNTS_ECR_READ_ACCESS }}
         run: terragrunt apply-all --terragrunt-non-interactive
