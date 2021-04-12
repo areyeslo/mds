@@ -52,3 +52,4 @@ jobs:
         if: ${{ success() }}
         run: |
           aws ecs update-service --cluster=mds-cluster --service=${{ matrix.repo }}-service --force-new-deployment
+        continue-on-error: true # Remove once in prod
