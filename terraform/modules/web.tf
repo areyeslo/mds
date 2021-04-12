@@ -59,8 +59,8 @@ resource "aws_ecs_service" "web" {
   health_check_grace_period_seconds = 60
   wait_for_steady_state             = false # Setting to true ensures task is successful, but causes github runner to wait
   platform_version                  = "1.4.0"
-  minimumHealthyPercent             = 100
-  maximumHealthyPercent             = 150
+  deployment_maximum_percent        = 100
+  deployment_minimum_healthy_percent = 150
 
   capacity_provider_strategy {
     capacity_provider = "FARGATE_SPOT"
