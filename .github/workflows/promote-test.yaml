@@ -66,4 +66,4 @@ jobs:
       - name: Update service tasks
         if: ${{ success() }}
         run: |
-          aws ecs update-service --cluster=mds-cluster --service=${{ matrix.repo }}-service --force-new-deployment
+          aws ecs update-service --cluster=mds-cluster --service=${{ matrix.repo }}-service --force-new-deployment > /dev/null
