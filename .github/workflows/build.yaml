@@ -1,7 +1,7 @@
 name: Build and push to AWS
 
 on:
-  pull_request:
+  push:
     branches:
       - "main"
 
@@ -21,21 +21,19 @@ jobs:
             repo: mds-web
           - service: services/core-api
             repo: mds-api
+          - service: migrations
+            repo: mds-flyway
 
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-
-      - name: fetch working tree info
-        run: |
-          git fetch --no-tags --prune origin ${{ github.base_ref }}
 
       - name: Capture changes to build for
         id: changes
         # gets list of files changed between this branch and develop
         # parses out special characters that cause hidden output truncation
         run: |
-          CHANGES=$(git diff --name-only origin/${{ github.base_ref }} HEAD)
+          CHANGES=$(git diff --name-only HEAD~1 HEAD)
           CHANGES="${CHANGES//'%'/'%25'}"
           CHANGES="${CHANGES//$'\n'/'%0A'}"
           CHANGES="${CHANGES//$'\r'/'%0D'}"

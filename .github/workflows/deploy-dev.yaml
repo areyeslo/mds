@@ -66,8 +66,6 @@ jobs:
     runs-on: ubuntu-20.04
     needs: infra-plan-dev
     timeout-minutes: 20
-    environment:
-      name: development
 
     steps:
       - name: Check out the repo

@@ -22,6 +22,7 @@ jobs:
         include:
           - repo: mds-web
           - repo: mds-api
+          - repo: mds-flyway
     environment:
       name: production
 
@@ -41,7 +42,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Pull and tag with dev
+      - name: Pull and tag with prod
         run: |
           docker pull ${{ env.IMAGE_URI }}${{ matrix.repo }}:${{ env.TAG_ENV }}
           docker tag ${{ env.IMAGE_URI }}${{ matrix.repo }}:${{ env.TAG_ENV }} ${{ env.IMAGE_URI }}${{ matrix.repo }}:${{ env.TAG_PROMOTE }}
@@ -60,6 +61,6 @@ jobs:
           role-skip-session-tagging: true
 
       - name: Update service tasks
-        if: ${{ success() }}
+        if: ${{ success() }} && matrix.repo != "mds-flyway"
         run: |
           aws ecs update-service --cluster=mds-cluster --service=${{ matrix.repo }}-service --force-new-deployment > /dev/null
