@@ -61,6 +61,6 @@ jobs:
           role-skip-session-tagging: true
 
       - name: Update service tasks
-        if: ${{ success() }} && matrix.repo != "mds-flyway"
+        if: ${{ success() }} && matrix.repo != 'mds-flyway'
         run: |
           aws ecs update-service --cluster=mds-cluster --service=${{ matrix.repo }}-service --force-new-deployment > /dev/null
