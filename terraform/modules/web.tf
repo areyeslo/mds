@@ -1,6 +1,6 @@
 resource "aws_ecs_task_definition" "web" {
   count                    = local.create_ecs_service
-  family                   = "mds-task"
+  family                   = "${var.configs["web"]["container_name"]}-task"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.mds_app_container_role.arn
   network_mode             = "awsvpc"
