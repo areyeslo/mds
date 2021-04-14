@@ -28,6 +28,10 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
+      - name: fetch working tree info
+        run: |
+          git fetch --no-tags --prune origin ${{ github.ref }}
+
       - name: Capture changes to build for
         id: changes
         # gets list of files changed between this branch and develop
