@@ -5,6 +5,7 @@ service_name: minesdigitalservices
 ecrs:
   - mds-web
   - mds-api
+  - mds-flyway
 env_buckets:
   dev: mds-env-dev-cacentral1-xbvyjgyklltkj9
   test: mds-env-test
@@ -28,6 +29,9 @@ configs:
       replicas: 3
       port: 5000
       container_name: mds-api
+    flyway:
+      ecr_repo: mds-flyway
+      container_name: mds-flyway
 
   test:
     web:
@@ -44,6 +48,9 @@ configs:
       replicas: 3
       port: 5000
       container_name: mds-api
+    flyway:
+      ecr_repo: mds-flyway
+      container_name: mds-flyway
 
   prod:
     web:
@@ -60,3 +67,6 @@ configs:
       replicas: 3
       port: 5000
       container_name: mds-api
+    flyway:
+      ecr_repo: mds-flyway
+      container_name: mds-flyway
