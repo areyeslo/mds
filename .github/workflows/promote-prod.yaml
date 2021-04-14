@@ -49,6 +49,19 @@ jobs:
           docker push ${{ env.IMAGE_URI }}${{ matrix.repo }} --all-tags
         continue-on-error: true
 
+  update-aws-test-tasks:
+    name: update-aws-test-tasks
+    needs: promote-to-test
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          - repo: mds-web
+          - repo: mds-api
+    environment:
+      name: production
+
+    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1.5.8
         with:
@@ -61,6 +74,6 @@ jobs:
           role-skip-session-tagging: true
 
       - name: Update service tasks
-        if: ${{ success() }} && matrix.repo != 'mds-flyway'
+        if: ${{ success() }}
         run: |
           aws ecs update-service --cluster=mds-cluster --service=${{ matrix.repo }}-service --force-new-deployment > /dev/null

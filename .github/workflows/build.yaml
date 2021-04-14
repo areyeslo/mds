@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
 
       - name: fetch working tree info
         run: |
@@ -37,7 +39,7 @@ jobs:
         # gets list of files changed between this branch and develop
         # parses out special characters that cause hidden output truncation
         run: |
-          CHANGES=$(git diff --name-only ${{ github.sha }}~1 ${{ github.sha }})
+          CHANGES=$(git diff --name-only ${{ github.ref }}~1 ${{ github.ref }})
           CHANGES="${CHANGES//'%'/'%25'}"
           CHANGES="${CHANGES//$'\n'/'%0A'}"
           CHANGES="${CHANGES//$'\r'/'%0D'}"
