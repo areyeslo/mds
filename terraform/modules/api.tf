@@ -107,7 +107,7 @@ resource "aws_ecs_service" "api" {
   desired_count                     = var.configs["api"]["replicas"]
   enable_ecs_managed_tags           = true
   propagate_tags                    = "TASK_DEFINITION"
-  health_check_grace_period_seconds = 60
+  health_check_grace_period_seconds = 180
   wait_for_steady_state             = false # Setting to true ensures task is successful, but causes github runner to wait
   platform_version                  = "1.4.0"
 
