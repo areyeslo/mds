@@ -49,9 +49,9 @@ jobs:
           docker push ${{ env.IMAGE_URI }}${{ matrix.repo }} --all-tags
         continue-on-error: true
 
-  update-aws-test-tasks:
-    name: update-aws-test-tasks
-    needs: promote-to-test
+  update-aws-prod-tasks:
+    name: update-aws-prod-tasks
+    needs: promote-to-prod
     runs-on: ubuntu-20.04
     strategy:
       matrix:
