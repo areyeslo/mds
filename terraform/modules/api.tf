@@ -10,6 +10,13 @@ resource "aws_ecs_task_definition" "api" {
   tags                     = local.common_tags
   container_definitions = jsonencode([
     {
+      # Wait for the flyway sidecar container to exit before standing up api
+      dependsOn = [
+        {
+          containerName = "${var.configs["flyway"]["container_name"]}"
+          condition = "COMPLETE"
+        }
+      ]
       essential   = true
       name        = var.configs["api"]["container_name"]
       image       = "${var.ecr_arn}${var.configs["api"]["ecr_repo"]}:${var.image_tag}"
@@ -25,6 +32,11 @@ resource "aws_ecs_task_definition" "api" {
         {
           name  = "AWS_REGION",
           value = var.aws_region
+        },
+        {
+          # Overwrite hostname with ephemeral address
+          name = "DB_HOST"
+          value = aws_db_instance.mds_db.address
         }
       ]
       environmentFiles = [
@@ -44,8 +56,47 @@ resource "aws_ecs_task_definition" "api" {
       }
       mountPoints = []
       volumesFrom = []
+    },
+    {
+      # short-lived sidecar container
+      name        = var.configs["flyway"]["container_name"]
+      image       = "${var.ecr_arn}${var.configs["flyway"]["ecr_repo"]}:${var.image_tag}"
+      networkMode = "awsvpc"
+      environment = [
+        {
+          name  = "AWS_REGION",
+          value = var.aws_region
+        },
+        {
+          name = "DB_HOST"
+          value = aws_db_instance.mds_db.address
+        },
+        {
+          name = "FLYWAY_URL"
+          value = "jdbc:postgresql://${aws_db_instance.mds_db.address}/${var.rds_db_name}"
+        }
+      ]
+      environmentFiles = [
+        {
+          value = "arn:aws:s3:::${var.env_s3}/core_backend_${var.target_env}.env",
+          type  = "s3"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-create-group  = "true"
+          awslogs-group         = "/ecs/${var.configs["flyway"]["container_name"]}"
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "ecs"
+        }
+      }
+      mountPoints = []
+      volumesFrom = []
     }
   ])
+
+  depends_on = [aws_db_instance.mds_db]
 }
 
 resource "aws_ecs_service" "api" {
