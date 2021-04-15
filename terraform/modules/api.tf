@@ -69,7 +69,11 @@ resource "aws_ecs_task_definition" "api" {
           value = var.aws_region
         },
         {
-          name = "DB_HOST"
+          name = "FLYWAY_DB_HOST"
+          value = aws_db_instance.mds_db.address
+        },
+        {
+          name = "PGHOST"
           value = aws_db_instance.mds_db.address
         },
         {
