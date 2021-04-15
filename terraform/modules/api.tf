@@ -13,7 +13,7 @@ resource "aws_ecs_task_definition" "api" {
       # Wait for the flyway sidecar container to exit before standing up api
       dependsOn = [
         {
-          containerName = "${var.configs["flyway"]["container_name"]}"
+          containerName = var.configs["flyway"]["container_name"]
           condition = "COMPLETE"
         }
       ]
@@ -58,6 +58,7 @@ resource "aws_ecs_task_definition" "api" {
       volumesFrom = []
     },
     {
+      essential   = false
       # short-lived sidecar container
       name        = var.configs["flyway"]["container_name"]
       image       = "${var.ecr_arn}${var.configs["flyway"]["ecr_repo"]}:${var.image_tag}"
