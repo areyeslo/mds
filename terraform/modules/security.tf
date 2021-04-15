@@ -10,6 +10,11 @@ data "aws_security_group" "data" {
   name = "Data_sg"
 }
 
+# ALB Security Group: Edit to restrict access to the application
+data "aws_security_group" "app" {
+  name = "App_sg"
+}
+
 # Traffic to the ECS cluster should only come from the ALB
 resource "aws_security_group" "ecs_tasks" {
   name        = "mds-ecs-tasks-security-group"
