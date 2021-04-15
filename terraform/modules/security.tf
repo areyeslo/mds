@@ -44,7 +44,7 @@ resource "aws_security_group" "mds_db" {
     from_port = 5432
     to_port = 5432
     protocol = "tcp"
-    security_groups = [data.aws_security_group.data.id]
+    security_groups = [data.aws_security_group.app.id]
   }
 
   # Allow all outbound traffic.
@@ -69,7 +69,7 @@ resource "aws_security_group" "mds_redis" {
     from_port = 6379
     to_port = 6379
     protocol = "tcp"
-    security_groups = [data.aws_security_group.data.id]
+    security_groups = [data.aws_security_group.app.id]
   }
 
   # Allow all outbound traffic.
