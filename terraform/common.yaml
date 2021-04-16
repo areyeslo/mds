@@ -11,14 +11,14 @@ env_buckets:
   test: mds-env-test
   prod: mds-env-prod
 # in cpu units, 1024 = 1 vCPU
-# resources specified at task level (required) and are shared/split amongst replicas
+# resources specified at task level (required)
 # AWS Fargate specific sets https://docs.aws.amazon.com/AmazonECS/latest/userguide/fargate-task-defs.html (check this before adjusting cpu/mem)
 configs:
   dev:
     web:
       ecr_repo: mds-web
-      cpu: 2048
-      memory: 4096
+      cpu: 512
+      memory: 1024
       replicas: 3
       port: 80
       container_name: mds-web
@@ -36,8 +36,8 @@ configs:
   test:
     web:
       ecr_repo: mds-web
-      cpu: 2048
-      memory: 4096
+      cpu: 512
+      memory: 1024
       replicas: 3
       port: 80
       container_name: mds-web
@@ -55,8 +55,8 @@ configs:
   prod:
     web:
       ecr_repo: mds-web
-      cpu: 2048
-      memory: 4096
+      cpu: 512
+      memory: 1024
       replicas: 3
       port: 80
       container_name: mds-web
