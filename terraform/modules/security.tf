@@ -15,9 +15,15 @@ data "aws_security_group" "app" {
   name = "App_sg"
 }
 
+# Used in sg names so that 2 named groups from same resource may exist at once before destroying one
+resource "random_id" "unique" {
+  byte_length = 8
+}
+
 # Traffic to the ECS cluster should only come from the ALB
 resource "aws_security_group" "ecs_tasks" {
   name        = "mds-ecs-tasks-security-group"
+
   description = "allow inbound access from the ALB only"
   vpc_id      = module.network.aws_vpc.id
 
@@ -39,9 +45,12 @@ resource "aws_security_group" "ecs_tasks" {
 }
 
 resource "aws_security_group" "mds_db" {
-  name = "mds_db"
+  name = "mds_db-${random_id.unique.hex}"
+  lifecycle {
+    create_before_destroy = true
+  }
 
-  description = "mds-rds-postgres"
+  description = "mds-rds-database"
   vpc_id = module.network.aws_vpc.id
 
   # Only postgres in
@@ -64,7 +73,10 @@ resource "aws_security_group" "mds_db" {
 }
 
 resource "aws_security_group" "mds_redis" {
-  name = "mds_redis"
+  name = "mds_redis-${random_id.unique.hex}"
+  lifecycle {
+    create_before_destroy = true
+  }
 
   description = "mds-elasticache-redis"
   vpc_id = module.network.aws_vpc.id

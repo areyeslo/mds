@@ -21,4 +21,5 @@ resource "aws_db_instance" "mds_db" {
   db_subnet_group_name     = aws_db_subnet_group.mds_db_subnet_group.name
   vpc_security_group_ids   = [aws_security_group.mds_db.id]
 
+  depends_on = [aws_security_group.mds_db]
 }
