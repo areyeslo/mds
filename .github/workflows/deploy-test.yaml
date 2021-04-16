@@ -48,7 +48,6 @@ jobs:
           AWS_RDS_ADMIN_USER: ${{ secrets.AWS_RDS_ADMIN_USER }}
           AWS_RDS_ADMIN_PASSWORD: ${{ secrets.AWS_RDS_ADMIN_PASSWORD }}
         run: terragrunt run-all plan --terragrunt-non-interactive | tee /tmp/tg_plan
-        continue-on-error: true
 
       - name: Get Terraform Plan Output
         id: plan

@@ -58,8 +58,6 @@ jobs:
         include:
           - repo: mds-web
           - repo: mds-api
-    environment:
-      name: production
 
     steps:
       - name: Configure AWS credentials
