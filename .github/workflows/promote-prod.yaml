@@ -12,8 +12,20 @@ env:
   TAG_PROMOTE: prod
 
 jobs:
+  initiate-prod-promotion:
+    name: initiate-prod-promotion
+    runs-on: ubuntu-20.04
+    environment:
+      name: production
+
+    steps:
+      - name: Waiting for approval
+        runs: |
+          echo "Approval given for promotion to production"
+
   promote-to-prod:
     name: promote-to-prod
+    needs: initiate-prod-promotion
     runs-on: ubuntu-20.04
     # Note the lack of fail-fast, this is on purpose
     # not all images will have been built with this sha as a tag
@@ -23,8 +35,6 @@ jobs:
           - repo: mds-web
           - repo: mds-api
           - repo: mds-flyway
-    environment:
-      name: production
 
     steps:
       - name: Configure AWS credentials
