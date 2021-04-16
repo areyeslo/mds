@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Waiting for approval
-        runs: |
+        run: |
           echo "Approval given for promotion to production"
 
   promote-to-prod:
