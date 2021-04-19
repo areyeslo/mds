@@ -56,7 +56,7 @@ configs:
     web:
       ecr_repo: mds-web
       cpu: 512
-      memory: 1024
+      memory: 2048
       replicas: 3
       port: 80
       container_name: mds-web
