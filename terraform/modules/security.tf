@@ -86,7 +86,7 @@ resource "aws_security_group" "mds_redis" {
     from_port = 6379
     to_port = 6379
     protocol = "tcp"
-    security_groups = [data.aws_security_group.app.id]
+    security_groups = [data.aws_security_group.app.id, aws_security_group.ecs_tasks.id]
   }
 
   # Allow all outbound traffic.
