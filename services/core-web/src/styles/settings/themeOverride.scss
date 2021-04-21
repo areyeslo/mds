@@ -25,6 +25,10 @@
     width: 2px;
     background-color: $v-divider-color;
   }
+  &.ant-divider-plain {
+    height: 100%;
+    background-color: $light-grey;
+  }
 }
 .custom-large-divider {
   border: 2px solid $h-divider-color;
@@ -36,6 +40,18 @@
   }
 }
 
+// DRAWER
+.ant-drawer-body {
+  -webkit-box-flex: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  padding: 24px;
+  height: 100vh;
+  overflow: scroll;
+  font-size: 1rem;
+  line-height: 1.5715;
+  word-wrap: break-word;
+}
 // BUTTON
 .ant-btn,
 .ant-btn-sm,
@@ -612,4 +628,8 @@ select {
   .ant-timeline-item-tail {
     display: none;
   }
+}
+
+.ant-typography-expand {
+  color: $violet !important;
 }

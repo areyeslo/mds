@@ -29,6 +29,7 @@ import {
   getMineTenureTypeDropdownOptions,
   getMineTenureTypesHash,
   getExemptionFeeSatusDropDownOptions,
+  getGovernmentAgencyDropdownOptions,
 } from "@common/selectors/staticContentSelectors";
 import * as Strings from "@common/constants/strings";
 import * as FORM from "@/constants/forms";
@@ -56,6 +57,8 @@ const propTypes = {
   submitting: PropTypes.bool.isRequired,
   isNewRecord: PropTypes.bool,
   exemptionFeeSatusDropDownOptions: PropTypes.objectOf(CustomPropTypes.options).isRequired,
+  governmentAgencyTypeOptions: CustomPropTypes.options.isRequired,
+  initialValues: PropTypes.objectOf(PropTypes.any),
 };
 
 const defaultProps = {
@@ -63,6 +66,7 @@ const defaultProps = {
   currentMineTypes: [],
   mine_types: [],
   isNewRecord: false,
+  initialValues: {},
 };
 
 export class MineRecordForm extends Component {
@@ -70,6 +74,7 @@ export class MineRecordForm extends Component {
     activeKey: [],
     usedTenureTypes: [],
     showStatusDate: false,
+    hasGovernmentAgency: false,
   };
 
   componentDidMount() {
@@ -80,6 +85,11 @@ export class MineRecordForm extends Component {
       const date = new Date();
       this.props.change("status_date", date);
     }
+
+    if (this.props.initialValues && this.props.initialValues.government_agency_type_code)
+      this.setState({
+        hasGovernmentAgency: true,
+      });
   }
 
   /**
@@ -147,9 +157,10 @@ export class MineRecordForm extends Component {
   addField = (event, fields) => {
     const totalTypes = fields.length + this.props.currentMineTypes.length;
     event.preventDefault();
-    if (totalTypes === 4) {
+    if (totalTypes >= 1) {
       notification.error({
-        message: "You cannot have more than 4 tenures associated with a mine",
+        message:
+          "You cannot have more than 1 tenures associated with this site. If you want to edit, please delete the existing tenures and add a new one.",
         duration: 10,
       });
     } else {
@@ -160,12 +171,12 @@ export class MineRecordForm extends Component {
 
   createPanelHeader = (index, fields) => (
     <div className="inline-flex between">
-      <Form.Item style={{ marginTop: "15px" }} label={`New Mine Type: ${index + 1}`} />
+      <Form.Item style={{ marginTop: "15px" }} label={`New Site Property: ${index + 1}`} />
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div onClick={(event) => event.stopPropagation()}>
         <Popconfirm
           placement="topRight"
-          title={`Are you sure you want to remove Mine Type ${index + 1}?`}
+          title={`Are you sure you want to remove Site Property ${index + 1}?`}
           onConfirm={(event) => {
             this.removeField(event, fields, index);
           }}
@@ -183,6 +194,20 @@ export class MineRecordForm extends Component {
   toggleStatusDate = () =>
     this.setState((prevState) => ({ showStatusDate: !prevState.showStatusDate }));
 
+  toggleGovernmentAgency = () => {
+    this.setState((prevState) => {
+      if (!prevState.hasGovernmentAgency) {
+        this.props.change("exemption_fee_status_code", "Y");
+      } else {
+        this.props.change("exemption_fee_status_code", null);
+        this.props.change("exemption_fee_status_note", null);
+      }
+      return { hasGovernmentAgency: !prevState.hasGovernmentAgency };
+    });
+
+    this.props.change("government_agency_type_code", null);
+  };
+
   // When the status changes, set the status date to current date.
   onStatusChange = () => {
     const date = new Date();
@@ -193,19 +218,19 @@ export class MineRecordForm extends Component {
     <div className="inline-flex between">
       <Form.Item
         style={{ marginTop: "15px" }}
-        label={`Existing Mine Type: ${this.props.mineTenureHash[mineTenureCode]}`}
+        label={`Existing Site Property: ${this.props.mineTenureHash[mineTenureCode]}`}
       />
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div onClick={(event) => event.stopPropagation()}>
         <Popconfirm
           placement="topRight"
-          title={`Are you sure you want to remove Mine Type ${this.props.mineTenureHash[mineTenureCode]}?`}
+          title={`Are you sure you want to remove Site Property ${this.props.mineTenureHash[mineTenureCode]}?`}
           onConfirm={(event) => this.props.handleDelete(event, mineTenureCode)}
           okText="Yes"
           cancelText="No"
         >
           <Button ghost>
-            <img name="remove" src={TRASHCAN} alt="Remove Mine Type" />
+            <img name="remove" src={TRASHCAN} alt="Remove Site Property" />
           </Button>
         </Popconfirm>
       </div>
@@ -310,8 +335,8 @@ export class MineRecordForm extends Component {
         <Button className="btn--dropdown" onClick={(event) => this.addField(event, fields)}>
           <PlusOutlined style={{ color: Styles.COLOR.violet }} />
           {fields.length === 0 && !this.props.currentMineTypes
-            ? "Add Mine Type"
-            : "Add Another Mine Type"}
+            ? "Add Site Property"
+            : "Add Another Site Property"}
         </Button>
       </div>
     );
@@ -419,8 +444,68 @@ export class MineRecordForm extends Component {
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item label="Mine Type" />
-        <FieldArray name="mine_types" component={renderTypeSelect} />
+        <Row gutter={16}>
+          <Col md={12} xs={24}>
+            <Form.Item label="Does this mine site belong to a government agency?">
+              <Radio.Group
+                onChange={this.toggleGovernmentAgency}
+                value={this.state.hasGovernmentAgency}
+                defaultValue={this.state.hasGovernmentAgency}
+              >
+                <Radio value>Yes</Radio>
+                <Radio value={false}>No</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+          {this.state.hasGovernmentAgency && (
+            <Col md={12} xs={24}>
+              <Form.Item>
+                <Field
+                  id="exemption_fee_status_code"
+                  name="exemption_fee_status_code"
+                  label="Inspection Fee Status"
+                  disabled
+                  component={renderConfig.SELECT}
+                  validate={[validateSelectOptions(this.props.exemptionFeeSatusDropDownOptions)]}
+                  data={this.props.exemptionFeeSatusDropDownOptions}
+                />
+              </Form.Item>
+            </Col>
+          )}
+        </Row>
+        {this.state.hasGovernmentAgency && (
+          <>
+            <Row gutter={16}>
+              <Col md={12} xs={24}>
+                <Field
+                  id="government_agency_type_code"
+                  name="government_agency_type_code"
+                  label="Government Agency *"
+                  placeholder="Select an Agency"
+                  component={renderConfig.SELECT}
+                  data={this.props.governmentAgencyTypeOptions}
+                  validate={[
+                    required,
+                    validateSelectOptions(this.props.governmentAgencyTypeOptions),
+                  ]}
+                />
+              </Col>
+              <Col md={12} xs={24}>
+                <Form.Item>
+                  <Field
+                    id="exemption_fee_status_note"
+                    name="exemption_fee_status_note"
+                    label="Fee Exemption Note"
+                    component={renderConfig.AUTO_SIZE_FIELD}
+                    validate={[maxLength(300)]}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.Item label="Site Property" />
+            <FieldArray name="mine_types" component={renderTypeSelect} />
+          </>
+        )}
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item>
@@ -443,34 +528,6 @@ export class MineRecordForm extends Component {
                 label="Major Mine"
                 type="checkbox"
                 component={renderConfig.CHECKBOX}
-                validate={[maxLength(300)]}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item>
-              <Field
-                id="exemption_fee_status_code"
-                name="exemption_fee_status_code"
-                label="Fee Exemption"
-                placeholder="Select a fee exemption status"
-                component={renderConfig.SELECT}
-                validate={[validateSelectOptions(this.props.exemptionFeeSatusDropDownOptions)]}
-                data={this.props.exemptionFeeSatusDropDownOptions}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item>
-              <Field
-                id="exemption_fee_status_note"
-                name="exemption_fee_status_note"
-                label="Fee Exemption Note"
-                component={renderConfig.AUTO_SIZE_FIELD}
                 validate={[maxLength(300)]}
               />
             </Form.Item>
@@ -509,6 +566,7 @@ export default compose(
     currentMineTypes: getCurrentMineTypes(state),
     mineStatusDropDownOptions: getMineStatusDropDownOptions(state),
     mineRegionOptions: getMineRegionDropdownOptions(state),
+    governmentAgencyTypeOptions: getGovernmentAgencyDropdownOptions(state),
     mineTenureHash: getMineTenureTypesHash(state),
     mineCommodityOptionsHash: getCommodityOptionHash(state),
     mineDisturbanceOptionsHash: getDisturbanceOptionHash(state),
