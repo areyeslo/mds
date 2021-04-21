@@ -65,7 +65,7 @@ jobs:
           role-skip-session-tagging: true
 
       - name: Login to Amazon ECR
-        if: steps.detected.outputs.do_build != 'no'
+        # if: steps.detected.outputs.do_build != 'no'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
@@ -78,7 +78,7 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Set up Docker Buildx
-        if: steps.detected.outputs.do_build != 'no'
+        # if: steps.detected.outputs.do_build != 'no'
         uses: docker/setup-buildx-action@v1
 
       # TODO: seperate real push to avoid half-built release
