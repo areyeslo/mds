@@ -11,6 +11,7 @@ locals {
   rds_password     = get_env("AWS_RDS_ADMIN_PASSWORD", "")
   env_bucket       = local.common["env_buckets"][local.environment]
   configs          = local.common["configs"][local.environment]
+  storage_buckets  = local.common["storage_buckets"][local.environment]
 }
 
 generate "remote_state" {
@@ -41,5 +42,6 @@ rds_username = "${local.rds_username}"
 rds_password = "${local.rds_password}"
 env_s3 = "${local.env_bucket}"
 configs = ${jsonencode(local.configs)}
+storage_buckets = ${jsonencode(local.storage_buckets)}
 EOF
 }
