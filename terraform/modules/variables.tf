@@ -123,3 +123,7 @@ variable "rds_port" {
 variable "configs" {
   description = "Contains a mapping of service configurations"
 }
+
+variable "storage_buckets" {
+  description = "Contains a list of s3 buckets for this workspace"
+}

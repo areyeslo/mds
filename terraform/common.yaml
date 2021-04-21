@@ -7,9 +7,16 @@ ecrs:
   - mds-api
   - mds-flyway
 env_buckets:
-  dev: mds-env-dev-cacentral1-xbvyjgyklltkj9
+  dev: mds-env-dev
   test: mds-env-test
   prod: mds-env-prod
+storage_buckets:
+  dev:
+    - mds-env-dev
+  test:
+    - mds-env-test
+  prod:
+    - mds-env-prod
 # in cpu units, 1024 = 1 vCPU
 # resources specified at task level (required)
 # AWS Fargate specific sets https://docs.aws.amazon.com/AmazonECS/latest/userguide/fargate-task-defs.html (check this before adjusting cpu/mem)
