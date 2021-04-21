@@ -1,6 +1,7 @@
 import RenderCheckbox from "./RenderCheckbox";
 import RenderAutocomplete from "./RenderAutoComplete";
 import RenderAutoSizeField from "./RenderAutoSizeField";
+import RenderRichTextField from "./RenderRichTextField";
 import RenderCascader from "./RenderCascader";
 import RenderDate from "./RenderDate";
 import RenderTime from "./RenderTime";
@@ -21,6 +22,7 @@ export const renderConfig = {
   CHECKBOX: RenderCheckbox,
   AUTOCOMPLETE: RenderAutocomplete,
   AUTO_SIZE_FIELD: RenderAutoSizeField,
+  RICH_TEXT_FIELD: RenderRichTextField,
   CASCADER: RenderCascader,
   DATE: RenderDate,
   TIME: RenderTime,

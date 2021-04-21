@@ -9,6 +9,7 @@ from datetime import datetime
 
 from app.extensions import db
 from app.api.utils.models_mixins import AuditMixin, Base
+from bs4 import BeautifulSoup
 
 
 def get_model_by_model_name(model_name):
@@ -121,10 +122,38 @@ class DocumentTemplate(Base, AuditMixin):
             if template_data.get('images'):
                 del template_data['images']
 
+        def replace_html(self, template_data):
+            if template_data['letter_body']:
+                for paragraph in doc.paragraphs:
+                    if 'letter_body' in paragraph.text:
+                        paragraph.clear()
+                        #soup = BeautifulSoup(template_data['letter_body'], 'html.parser')
+                        #for paragraph in soup.find_all('p'):
+                        #    run = paragraph.add_run('-------------------TEST---------------')
+                        html = template_data['letter_body'].split('<')
+                        html = [html[0]] + ['<' + l for l in html[1:]]
+                        for run in html:
+                            if run.startswith('<p>'):
+                                run = run.lstrip('<p>')
+                            if run.startswith('</p>'):
+                                run = run.lstrip('</p>')
+                            if run.startswith('<strong>'):
+                                run = run.lstrip('<strong>')
+                                runner = paragraph.add_run(run)
+                                runner.bold = True
+                            elif run.startswith('</strong>'):
+                                run = run.lstrip('</strong>')
+                                runner = paragraph.add_run(run)
+                            else:
+                                paragraph.add_run(run)
+
+                del template_data['letter_body']
+
         doc = None
         if self.document_template_code in ('PMT', 'PMA', 'NPE', 'NCL', 'NWL', 'NRL'):
             doc = docx.Document(self.os_template_file_path)
             insert_images(doc, template_data)
+            replace_html(doc, template_data)
 
         if doc:
             fileobj = io.BytesIO()
