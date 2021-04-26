@@ -14,7 +14,7 @@ resource "aws_ecs_task_definition" "api" {
       dependsOn = [
         {
           containerName = var.configs["flyway"]["container_name"]
-          condition = "SUCCESS"
+          condition = "COMPLETE"
         }
       ]
       essential   = true
