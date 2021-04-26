@@ -92,12 +92,12 @@ variable "rds_engine" {
 
 variable "rds_engine_version" {
   description = "What version of the engine to use (IAM auth supported only on <=12.x)"
-  default = "13"
+  default = "9.6"
 }
 
 variable "rds_instance_class" {
-  description = "Database instance type"
-  default = "db.m6g.large"
+  description = "Database instance type, note that max_connections is tied to memory of instance class according to: LEAST({DBInstanceClassMemory/9531392}, 5000)"
+  default = "db.m5.large"
 }
 
 variable "rds_db_name" {
