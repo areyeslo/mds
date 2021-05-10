@@ -135,6 +135,7 @@ class MineReportListResource(Resource, UserMixin):
         except Exception as e:
             raise InternalServerError(f'Error when saving: {e}')
 
+        from app.api.utils.core_activity_engine import CoreActivityEngine, Verbs, Objects
         CoreActivityEngine.process(
             Verbs.added,
             f'{CoreActivityEngine.get_username()} added a {mine_report.submission_year} {mine_report_definition.report_name} report to {mine.mine_name}',

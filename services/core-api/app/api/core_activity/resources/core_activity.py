@@ -17,7 +17,7 @@ class CoreActivityListResource(Resource, UserMixin):
             'published_since': 'Activities that have been published since this date',
             'published_before': 'Activities that have been published before this date'
         })
-    #@requires_role_view_all
+    @requires_role_view_all
     @api.marshal_with(CORE_ACTIVITY, envelope='records', code=200)
     def get(self):
 
