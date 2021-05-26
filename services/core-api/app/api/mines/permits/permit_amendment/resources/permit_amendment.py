@@ -22,6 +22,8 @@ from app.api.now_applications.models.now_application_identity import NOWApplicat
 from app.api.now_applications.models.now_application_document_xref import NOWApplicationDocumentXref
 from app.api.now_applications.models.now_application_document_identity_xref import NOWApplicationDocumentIdentityXref
 from app.api.mines.permits.permit_amendment.models.permit_amendment_document import PermitAmendmentDocument
+from app.api.mines.mine.resources.mine_type import MineType
+from app.api.mines.mine.models.mine_type_detail import MineTypeDetail
 
 ROLES_ALLOWED_TO_CREATE_HISTORICAL_AMENDMENTS = [MINE_ADMIN, EDIT_HISTORICAL_PERMIT_AMENDMENTS]
 
@@ -80,6 +82,8 @@ class PermitAmendmentListResource(Resource, UserMixin):
         'regional_office', type=str, location='json', help='The regional office for this permit.')
     parser.add_argument(
         'is_historical_amendment', type=bool, location='json', help='Is it a historical amendment')
+    parser.add_argument(
+        'populate_with_conditions', type=bool, location='json', help='Determines if the Permit should be generated through Core with conditions.')
 
     @api.doc(params={
         'permit_amendment_guid': 'Permit amendment guid.',
@@ -201,24 +205,47 @@ class PermitAmendmentListResource(Resource, UserMixin):
                                             new_pa.permit_amendment_id, condition.condition,
                                             condition.display_order, condition.sub_conditions)
 
+            populate_with_conditions = data.get('populate_with_conditions', True)
             if application_identity.now_application:
-                if application_identity.application_type_code == "ADA":
+                if populate_with_conditions:
+                    if application_identity.application_type_code == "ADA":
 
-                    conditions = PermitConditions.find_all_by_permit_amendment_id(
-                        application_identity.source_permit_amendment_id)
-                    if conditions:
-                        for condition in conditions:
-                            PermitConditions.create(condition.condition_category_code,
-                                                    condition.condition_type_code,
-                                                    new_pa.permit_amendment_id, condition.condition,
-                                                    condition.display_order,
-                                                    condition.sub_conditions)
+                        conditions = PermitConditions.find_all_by_permit_amendment_id(
+                            application_identity.source_permit_amendment_id)
+                        if conditions:
+                            for condition in conditions:
+                                PermitConditions.create(condition.condition_category_code,
+                                                        condition.condition_type_code,
+                                                        new_pa.permit_amendment_id,
+                                                        condition.condition,
+                                                        condition.display_order,
+                                                        condition.sub_conditions)
+                        else:
+                            create_standard_conditions(application_identity)
                     else:
                         create_standard_conditions(application_identity)
-                else:
-                    create_standard_conditions(application_identity)
 
-                db.session.commit()
+                    db.session.commit()
+
+                # create site properties if DFT permit_amendment
+                if not application_identity.now_application.site_property:
+                    site_property = MineType.find_by_permit_guid(permit_guid, mine_guid)
+
+                    if site_property:
+                        MineType.create_or_update_mine_type_with_details(
+                            mine_guid=mine_guid,
+                            now_application_guid=now_application_guid,
+                            mine_tenure_type_code=site_property.mine_tenure_type_code,
+                            mine_disturbance_codes=[
+                                detail.mine_disturbance_code
+                                for detail in site_property.mine_type_detail
+                                if detail.mine_disturbance_code
+                            ],
+                            mine_commodity_codes=[
+                                detail.mine_commodity_code
+                                for detail in site_property.mine_type_detail
+                                if detail.mine_commodity_code
+                            ])
 
         new_pa.save()
         return new_pa
@@ -293,6 +320,12 @@ class PermitAmendmentResource(Resource, UserMixin):
         location='json',
         store_missing=False,
         help='The file metadata for each file from the previous permit amendment.')
+    parser.add_argument(
+        'site_properties',
+        type=json.dumps,
+        location='json',
+        store_missing=False,
+        help='{ mine_commodity_code, mine_disturbance_code}.')
 
     @api.doc(params={'permit_amendment_guid': 'Permit amendment guid.'})
     @requires_role_view_all
@@ -319,11 +352,23 @@ class PermitAmendmentResource(Resource, UserMixin):
             raise BadRequest('Permits mine_guid and supplied mine_guid mismatch.')
 
         data = self.parser.parse_args()
+        data['site_properties'] = json.loads(data.get('site_properties', '{}'))
         current_app.logger.info(f'updating {permit_amendment} with >> {data}')
 
         validate_issue_date(
             data.get('issue_date'), data.get('permit_amendment_type_code'),
             permit_amendment.permit_guid, mine_guid)
+
+        if data.get(
+                'site_properties') != {} and permit_amendment.permit_amendment_status_code == 'DFT':
+
+            MineType.create_or_update_mine_type_with_details(
+                mine_guid=mine_guid,
+                now_application_guid=permit_amendment.now_application_guid,
+                mine_tenure_type_code=data.get('site_properties', {}).get('mine_tenure_type_code'),
+                mine_disturbance_codes=data.get('site_properties',
+                                                {}).get('mine_disturbance_code', []),
+                mine_commodity_codes=data.get('site_properties', {}).get('mine_commodity_code', []))
 
         for key, value in data.items():
             if key == 'uploadedFiles':
@@ -334,6 +379,8 @@ class PermitAmendmentResource(Resource, UserMixin):
                         mine_guid=permit_amendment.mine_guid,
                     )
                     permit_amendment.related_documents.append(new_pa_doc)
+            elif key == 'site_properties':
+                continue
             else:
                 setattr(permit_amendment, key, value)
 
@@ -387,7 +434,7 @@ class PermitAmendmentResource(Resource, UserMixin):
         'permit_amendment_guid': 'Permit amendment guid.',
         'permit_guid': 'Permit GUID'
     })
-    @requires_role_mine_admin
+    @requires_role_edit_permit
     @api.response(204, 'Successfully deleted.')
     def delete(self, mine_guid, permit_guid, permit_amendment_guid):
         permit_amendment = PermitAmendment.find_by_permit_amendment_guid(permit_amendment_guid)

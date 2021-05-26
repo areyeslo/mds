@@ -116,6 +116,9 @@ export class PermitAmendmentForm extends Component {
   };
 
   render() {
+    const isPermitCoalOrMineral =
+      this.props.initialValues.permit_prefix === "C" ||
+      this.props.initialValues.permit_prefix === "M";
     return (
       <Form layout="vertical" onSubmit={this.props.handleSubmit}>
         <Row gutter={48}>
@@ -140,6 +143,15 @@ export class PermitAmendmentForm extends Component {
                 label="Issue Date*"
                 component={renderConfig.DATE}
                 validate={[required, dateNotInFuture]}
+              />
+            </Form.Item>
+            <Form.Item>
+              <Field
+                id="authorization_end_date"
+                name="authorization_end_date"
+                label={isPermitCoalOrMineral ? "Authorization End Date" : "Authorization End Date*"}
+                component={renderConfig.DATE}
+                validate={isPermitCoalOrMineral ? [] : [required]}
               />
             </Form.Item>
 

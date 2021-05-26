@@ -98,3 +98,22 @@ export const PERMIT_AMENDMENT_TYPES = {
   amendment: "AMD",
   amalgamated: "ALG",
 };
+
+export const BOOLEAN_DROPDOWN_OPTIONS = [
+  { value: "false", label: "No" },
+  { value: "true", label: "Yes" },
+];
+
+export const BOOLEAN_OPTIONS_HASH = {
+  false: "No",
+  true: "Yes",
+  null: EMPTY_FIELD,
+};
+
+export const APPLICATION_TYPES_BY_PERMIT_PREFIX = {
+  P: ["PLA"],
+  G: ["SAG"],
+  M: ["MIN"],
+  C: ["COL"],
+  Q: ["QCA", "QIM"],
+};

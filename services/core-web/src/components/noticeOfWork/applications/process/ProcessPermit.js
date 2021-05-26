@@ -28,6 +28,7 @@ import {
   formatDate,
   isPlacerAdjustmentFeeValid,
   isPitsQuarriesAdjustmentFeeValid,
+  determineExemptionFeeStatus,
 } from "@common/utils/helpers";
 import { bindActionCreators } from "redux";
 import {
@@ -63,6 +64,9 @@ const rejectedCode = "REJ";
 const rejectedLetterCode = "RJL";
 const withdrawnCode = "WDN";
 const withdrawnLetterCode = "WDL";
+const noPermitRequiredCode = "NPR";
+const noPermitRequiredLetterCode = "NPR";
+const noPermitRequiredIPLetterCode = "NPI";
 const originalPermit = "OGP";
 const regionHash = {
   SE: "Cranbrook",
@@ -184,6 +188,16 @@ export class ProcessPermit extends Component {
         statusCode: withdrawnCode,
         letterCode: withdrawnLetterCode,
       },
+      NPR: {
+        title: "No Permit Required",
+        statusCode: noPermitRequiredCode,
+        letterCode: noPermitRequiredLetterCode,
+      },
+      NPI: {
+        title: "No Permit Required IP",
+        statusCode: noPermitRequiredCode,
+        letterCode: noPermitRequiredIPLetterCode,
+      },
     };
     const signature = this.props.noticeOfWork?.issuing_inspector?.signature;
 
@@ -200,6 +214,19 @@ export class ProcessPermit extends Component {
       )
       .then(() => {
         const initialValues = {};
+        let statusCode = "";
+
+        if (type === "AIA") {
+          const isExploration = this.props.draftPermit.permit_no.charAt(1) === "X";
+          statusCode = determineExemptionFeeStatus(
+            this.props.draftPermit.permit_status_code,
+            this.props.draftPermit.permit_prefix,
+            this.props.noticeOfWork?.site_property?.mine_tenure_type_code,
+            isExploration,
+            this.props.noticeOfWork?.site_property?.mine_disturbance_code
+          );
+        }
+
         this.props.documentContextTemplate.document_template.form_spec.map(
           // eslint-disable-next-line
           (item) => (initialValues[item.id] = item["context-value"])
@@ -213,8 +240,10 @@ export class ProcessPermit extends Component {
             type,
             generateDocument: this.handleGenerateDocumentFormSubmit,
             noticeOfWork: this.props.noticeOfWork,
+            draftAmendment: this.props.draftAmendment,
             signature,
             issuingInspectorGuid: this.props.noticeOfWork?.issuing_inspector?.party_guid,
+            exemptionFeeStatusCode: statusCode,
           },
           width: "50vw",
           content: modalConfig.NOW_STATUS_LETTER_MODAL,
@@ -244,10 +273,25 @@ export class ProcessPermit extends Component {
       });
   };
 
+  openNoPermitRequiredSelectionModal = () => {
+    return this.props.openModal({
+      props: {
+        title: "No Permit Required Letter Selection",
+        nextStep: this.openUpdateStatusGenerateLetterModal,
+        signature: this.props.noticeOfWork?.issuing_inspector?.signature,
+      },
+      width: "50vw",
+      content: modalConfig.NO_PERMIT_REQUIRED_SELECTION_MODAL,
+    });
+  };
+
   createPermitGenObject = (noticeOfWork, draftPermit, amendment = {}) => {
     const permitGenObject = {
       permit_number: "",
-      auth_end_date: "",
+      formatted_issue_date: formatDate(amendment.issue_date),
+      issue_date: amendment.issue_date,
+      formatted_auth_end_date: formatDate(amendment.authorization_end_date),
+      auth_end_date: amendment.authorization_end_date,
       regional_office: regionHash[noticeOfWork.mine_region],
       current_date: moment().format("Do"),
       current_month: moment().format("MMMM"),
@@ -374,12 +418,21 @@ export class ProcessPermit extends Component {
   };
 
   handleApplication = (values, code) => {
-    if (code === approvedCode) {
+    if (
+      code === approvedCode &&
+      this.props.draftAmendment &&
+      this.props.draftAmendment.has_permit_conditions
+    ) {
       return this.handleApprovedApplication(values);
     }
+    const codeMap = {
+      WDN: "withdrawn",
+      REJ: "rejected",
+      AIA: "approved",
+    };
     return this.afterSuccess(
       values,
-      `This application has been successfully ${code === "WDN" ? "withdrawn" : "rejected"}.`,
+      `This application has been successfully ${codeMap[code]}.`,
       code
     );
   };
@@ -410,8 +463,8 @@ export class ProcessPermit extends Component {
           this.props.documentContextTemplate,
           {
             ...permitObj,
-            auth_end_date: formatDate(values.auth_end_date),
-            issue_date: formatDate(values.issue_date),
+            formatted_auth_end_date: formatDate(values.auth_end_date),
+            formatted_issue_date: formatDate(values.issue_date),
             application_dated: formatDate(permitObj.application_date),
             final_application_package: this.getFinalApplicationPackage(this.props.noticeOfWork),
           },
@@ -510,6 +563,23 @@ export class ProcessPermit extends Component {
       });
     }
 
+    // Tenures, Disturbances, Commodities
+    if (
+      this.props.noticeOfWork &&
+      !(
+        this.props.noticeOfWork.site_property &&
+        this.props.noticeOfWork.site_property.mine_tenure_type_code
+      )
+    ) {
+      validationMessages.push({
+        message: "The Site Property fields must be specified.",
+        route: route.NOTICE_OF_WORK_APPLICATION.dynamicRoute(
+          this.props.noticeOfWork.now_application_guid,
+          "draft-permit/#site-properties"
+        ),
+      });
+    }
+
     // Final Application Package document titles
     const requestedDocuments = this.props.noticeOfWork?.documents?.filter(
       ({ is_final_package }) => is_final_package
@@ -520,7 +590,7 @@ export class ProcessPermit extends Component {
     const finalApplicationDocuments = [...requestedDocuments, ...originalDocuments];
     let titlesMissing = finalApplicationDocuments?.filter(({ preamble_title }) => !preamble_title)
       .length;
-    if (titlesMissing !== 0) {
+    if (titlesMissing !== 0 && this.props.draftAmendment?.has_permit_conditions) {
       validationMessages.push({
         message: `The Final Application Package has ${titlesMissing} documents that require a title.`,
         route: route.NOTICE_OF_WORK_APPLICATION.dynamicRoute(
@@ -613,6 +683,21 @@ export class ProcessPermit extends Component {
         route: route.NOTICE_OF_WORK_APPLICATION.dynamicRoute(
           this.props.noticeOfWork.now_application_guid,
           "administrative"
+        ),
+      });
+    }
+
+    // no permit document uploaded
+    if (
+      this.props.draftAmendment &&
+      this.props.draftAmendment?.related_documents?.length === 0 &&
+      !this.props.draftAmendment?.has_permit_conditions
+    ) {
+      validationMessages.push({
+        message: `The Draft Permit must have a Permit PDF uploaded.`,
+        route: route.NOTICE_OF_WORK_APPLICATION.dynamicRoute(
+          this.props.noticeOfWork.now_application_guid,
+          "draft-permit"
         ),
       });
     }
@@ -752,7 +837,7 @@ export class ProcessPermit extends Component {
     return validationMessages;
   };
 
-  menu = (validationErrors) => (
+  menu = (validationErrors, isNoWApplication) => (
     <Menu>
       <Menu.Item
         key="issue-permit"
@@ -773,6 +858,14 @@ export class ProcessPermit extends Component {
       >
         Withdraw application
       </Menu.Item>
+      {isNoWApplication && (
+        <Menu.Item
+          key="no-permit-required custom-menu-item"
+          onClick={this.openNoPermitRequiredSelectionModal}
+        >
+          No Permit Required
+        </Menu.Item>
+      )}
     </Menu>
   );
 
@@ -784,8 +877,10 @@ export class ProcessPermit extends Component {
     const isAmendment = this.props.noticeOfWork.type_of_application !== "New Permit";
     const isProcessed =
       this.props.noticeOfWork.now_application_status_code === approvedCode ||
-      this.props.noticeOfWork.now_application_status_code === rejectedCode;
+      this.props.noticeOfWork.now_application_status_code === rejectedCode ||
+      this.props.noticeOfWork.now_application_status_code === noPermitRequiredCode;
     const isApproved = this.props.noticeOfWork.now_application_status_code === approvedCode;
+    const isNoWApplication = this.props.noticeOfWork.application_type_code === "NOW";
     return (
       <>
         <NOWTabHeader
@@ -796,7 +891,10 @@ export class ProcessPermit extends Component {
             <>
               {!isProcessed && (
                 <AuthorizationWrapper permission={Permission.EDIT_PERMITS}>
-                  <Dropdown overlay={this.menu(hasValidationErrors)} placement="bottomLeft">
+                  <Dropdown
+                    overlay={this.menu(hasValidationErrors, isNoWApplication)}
+                    placement="bottomLeft"
+                  >
                     <Button type="primary" className="full-mobile">
                       Process <DownOutlined />
                     </Button>

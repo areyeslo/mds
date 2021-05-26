@@ -45,6 +45,8 @@ export const {
   getApplicationSourceTypeCodeOptions,
   getGovernmentAgencyTypeOptions,
   getCoreActivityObjectTypeOptions,
+  getConsequenceClassificationStatusCodeOptions,
+  getTSFOperatingStatusCodeOptions,
 } = staticContentReducer;
 
 const getVisibilityFilterOption = (_state, showActiveOnly = true) => showActiveOnly;
@@ -650,14 +652,14 @@ export const getBondDocumentTypeOptionsHash = createSelector(
   createLabelHash
 );
 
-export const getExemptionFeeSatusDropDownOptions = createSelectorWrapper(
+export const getExemptionFeeStatusDropDownOptions = createSelectorWrapper(
   getExemptionFeeStatusOptions,
   createDropDownList,
   ["description", "exemption_fee_status_code", "active_ind"]
 );
 
 export const getExemptionFeeStatusOptionsHash = createSelector(
-  [getExemptionFeeSatusDropDownOptions],
+  [getExemptionFeeStatusDropDownOptions],
   createLabelHash
 );
 
@@ -691,6 +693,28 @@ export const getApplicationSourceTypeCodeDropdownOptions = createSelectorWrapper
 
 export const getApplicationSourceTypeCodeOptionsHash = createSelector(
   [getApplicationSourceTypeCodeDropdownOptions],
+  createLabelHash
+);
+
+export const getConsequenceClassificationStatusCodeDropdownOptions = createSelectorWrapper(
+  getConsequenceClassificationStatusCodeOptions,
+  createDropDownList,
+  ["description", "consequence_classification_status_code", "active_ind"]
+);
+
+export const getConsequenceClassificationStatusCodeOptionsHash = createSelector(
+  [getConsequenceClassificationStatusCodeDropdownOptions],
+  createLabelHash
+);
+
+export const getTSFOperatingStatusCodeDropdownOptions = createSelectorWrapper(
+  getTSFOperatingStatusCodeOptions,
+  createDropDownList,
+  ["description", "tsf_operating_status_code", "active_ind"]
+);
+
+export const getTSFOperatingStatusCodeOptionsHash = createSelector(
+  [getTSFOperatingStatusCodeDropdownOptions],
   createLabelHash
 );
 

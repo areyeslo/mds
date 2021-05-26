@@ -27,7 +27,9 @@ class Permit(SoftDeleteMixin, AuditMixin, Base):
     permit_no = db.Column(db.String, nullable=False)
     permit_status_code = db.Column(
         db.String(2), db.ForeignKey('permit_status_code.permit_status_code'))
+    status_changed_timestamp = db.Column(db.DateTime)
     project_id = db.Column(db.String)
+
     _all_permit_amendments = db.relationship(
         'PermitAmendment',
         backref='permit',
@@ -136,7 +138,6 @@ class Permit(SoftDeleteMixin, AuditMixin, Base):
             raise Exception(
                 'Unable to delete permit with linked NOW application in Core to one of its permit amendments.'
             )
-
         if self.permit_amendments:
             for amendment in self.permit_amendments:
                 amendment.delete(is_force_delete=True)
@@ -243,9 +244,10 @@ class Permit(SoftDeleteMixin, AuditMixin, Base):
             if (permit_prefix == "P"
                     and mine_tenure_type_code == 'PLR') and exemption_fee_status_code != 'Y':
                 raise AssertionError('Exemption fee should be "Yes" for this permit')
-            elif is_exploration and len(mine_disturbance_codes) == 1 and all(
-                    x == 'SUR'
-                    for x in mine_disturbance_codes) and exemption_fee_status_code != 'Y':
+            elif is_exploration and mine_disturbance_codes and len(
+                    mine_disturbance_codes) == 1 and all(
+                        x == 'SUR'
+                        for x in mine_disturbance_codes) and exemption_fee_status_code != 'Y':
                 raise AssertionError('Exemption fee should be "Yes" for this permit')
             elif (permit_prefix == "M" or permit_prefix == "C") and (
                     mine_tenure_type_code == "MIN" or mine_tenure_type_code

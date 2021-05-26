@@ -5,6 +5,7 @@ exports[`ProcessPermit renders properly 1`] = `
   <NOWTabHeader
     handleDraftPermit={null}
     isEditMode={false}
+    isNoticeOfWorkTypeDisabled={true}
     showProgressButton={true}
     tab="PRO"
     tabActions={
@@ -85,6 +86,31 @@ exports[`ProcessPermit renders properly 1`] = `
                 <h3>
                   The following issues shall be resolved before you can issue this amendment.
                 </h3>
+              </ForwardRef>
+            </ForwardRef>
+            <ForwardRef
+              className="padding-md--bottom"
+            >
+              <ForwardRef
+                offset={2}
+                span={2}
+              >
+                <ForwardRef(StopOutlined)
+                  className="icon-sm padding-sm--top"
+                />
+              </ForwardRef>
+              <ForwardRef
+                span={16}
+              >
+                The Site Property fields must be specified.  
+                <LinkButton
+                  onClick={[Function]}
+                  style={null}
+                  tabIndex={0}
+                >
+                  <ForwardRef(LinkOutlined) />
+                   Resolve
+                </LinkButton>
               </ForwardRef>
             </ForwardRef>
             <ForwardRef

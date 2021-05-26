@@ -317,7 +317,7 @@ exports[`ReviewNOWApplication renders properly 1`] = `
                   "proposed_end_date": "2020-03-01",
                   "proposed_start_date": "2016-03-01",
                   "received_date": "",
-                  "sand_and_gravel": Object {
+                  "sand_gravel_quarry_operation": Object {
                     "details": Array [],
                   },
                   "settling_pond": Object {
@@ -392,7 +392,7 @@ exports[`ReviewNOWApplication renders properly 1`] = `
             "proposed_end_date": "2020-03-01",
             "proposed_start_date": "2016-03-01",
             "received_date": "",
-            "sand_and_gravel": Object {
+            "sand_gravel_quarry_operation": Object {
               "details": Array [],
             },
             "settling_pond": Object {
@@ -1073,8 +1073,8 @@ exports[`ReviewNOWApplication renders properly 1`] = `
             <Field
               component={[Function]}
               disabled={true}
-              id="merchantable_timber_volume"
-              name="merchantable_timber_volume"
+              id="total_merchantable_timber_volume"
+              name="total_merchantable_timber_volume"
             />
           </Col>
         </Row>
@@ -1332,9 +1332,11 @@ exports[`ReviewNOWApplication renders properly 1`] = `
             ],
             Array [
               "merchantable_timber_volume",
+              "total_merchantable_timber_volume",
             ],
             Array [
               "merchantable_timber_volume",
+              "total_merchantable_timber_volume",
             ],
           ],
           "results": Array [
@@ -1904,6 +1906,7 @@ exports[`ReviewNOWApplication renders properly 1`] = `
         categoriesToShow={
           Array [
             "AAF",
+            "MDO",
           ]
         }
         disclaimerText="Attach any file revisions or new files requested from the proponent here."

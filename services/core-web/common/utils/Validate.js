@@ -1,5 +1,6 @@
 import { memoize } from "lodash";
 import moment from "moment";
+import * as Strings from "@common/constants/strings";
 
 /**
  * Utility class for validating inputs using redux forms
@@ -204,4 +205,23 @@ export const validateDateRanges = (
   }
 
   return errorMessages;
+};
+
+export const requiredBoolean = (value) =>
+  value || value === false ? undefined : "This is a required field";
+
+export const validateIfApplicationTypeCorrespondsToPermitNumber = (
+  applicationType,
+  permit,
+  isAdminAmendment
+) => {
+  if (permit && applicationType) {
+    return permit?.permit_prefix &&
+      Strings.APPLICATION_TYPES_BY_PERMIT_PREFIX[permit.permit_prefix].includes(applicationType)
+      ? undefined
+      : `The ${
+          isAdminAmendment ? "Type of Administrative Amendment" : "Type of Notice of Work"
+        } does not match to the selected permit.`;
+  }
+  return undefined;
 };

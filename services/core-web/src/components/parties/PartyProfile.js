@@ -26,7 +26,7 @@ import {
   getPartyRelationshipTypeHash,
   getPartyBusinessRoleOptionsHash,
 } from "@common/selectors/staticContentSelectors";
-import { formatTitleString, formatDate, dateSorter } from "@common/utils/helpers";
+import { formatDate, dateSorter } from "@common/utils/helpers";
 import * as Strings from "@common/constants/strings";
 import { EDIT } from "@/constants/assets";
 import { modalConfig } from "@/components/modalContent/config";
@@ -207,12 +207,11 @@ export class PartyProfile extends Component {
     };
 
     if (this.state.isLoaded && party) {
-      const formattedName = formatTitleString(party.name);
       return (
         <div className="profile">
           <div className="profile__header">
             <div className="inline-flex between">
-              <h1>{formattedName}</h1>
+              <h1>{party.name}</h1>
               <div>
                 <AuthorizationWrapper permission={Permission.ADMIN} inTesting>
                   <Popconfirm
@@ -220,9 +219,7 @@ export class PartyProfile extends Component {
                     placement="bottom"
                     title={
                       <div>
-                        <p>
-                          Are you sure you want to delete the party &apos;{formattedName}&apos;?
-                        </p>
+                        <p>Are you sure you want to delete the party &apos;{party.name}&apos;?</p>
                         <p>Doing so will permanently remove the party and all associated roles.</p>
                       </div>
                     }
@@ -245,7 +242,7 @@ export class PartyProfile extends Component {
                         event,
                         party.party_guid,
                         this.editParty,
-                        ModalContent.EDIT_PARTY(formattedName),
+                        ModalContent.EDIT_PARTY(party.name),
                         this.props.provinceOptions
                       )
                     }

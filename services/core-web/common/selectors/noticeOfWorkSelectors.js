@@ -3,7 +3,10 @@ import { createSelector } from "reselect";
 import moment from "moment";
 import { getDurationTextInDays } from "@common/utils/helpers";
 import * as noticeOfWorkReducer from "../reducers/noticeOfWorkReducer";
-import { getDropdownNoticeOfWorkActivityTypeOptions } from "./staticContentSelectors";
+import {
+  getDropdownNoticeOfWorkActivityTypeOptions,
+  getDropdownNoticeOfWorkApplicationTypeOptions,
+} from "./staticContentSelectors";
 
 export const {
   getNoticeOfWorkList,
@@ -26,8 +29,8 @@ export const getNOWReclamationSummary = createSelector(
         // if the object does not contain total_disturbed_area || reclamation_cost - it means the activity doesn't have any reclamation data
         if (
           !isEmpty(noticeOfWork[value]) &&
-          ((!isNil(noticeOfWork[value].calculated_total_disturbance) &&
-            !isNil(noticeOfWork[value].total_disturbed_area)) ||
+          (!isNil(noticeOfWork[value].calculated_total_disturbance) ||
+            !isNil(noticeOfWork[value].total_disturbed_area) ||
             !isNil(noticeOfWork[value].reclamation_cost))
         ) {
           reclamationList.push({
@@ -106,26 +109,25 @@ export const getApplicationDelaysWithDuration = createSelector([getApplicationDe
 });
 
 export const getNoticeOfWork = createSelector([getNoticeOfWorkUnformatted], (noticeOfWork) => {
-  // TODO: Add back when follow up work is completed for NoW applications & site properties
-  // const siteProperty = noticeOfWork.site_property;
-  // const siteProperties = {
-  //   mine_tenure_type_code: "",
-  //   mine_commodity_code: [],
-  //   mine_disturbance_code: [],
-  // };
+  const siteProperty = noticeOfWork.site_property;
+  const siteProperties = {
+    mine_tenure_type_code: "",
+    mine_commodity_code: [],
+    mine_disturbance_code: [],
+  };
 
-  // if (siteProperty) {
-  //   siteProperties.mine_tenure_type_code = siteProperty.mine_tenure_type_code;
-  //   if (siteProperty.mine_type_detail) {
-  //     siteProperty.mine_type_detail.forEach((detail) => {
-  //       if (detail.mine_commodity_code) {
-  //         siteProperties.mine_commodity_code.push(detail.mine_commodity_code);
-  //       } else if (detail.mine_disturbance_code) {
-  //         siteProperties.mine_disturbance_code.push(detail.mine_disturbance_code);
-  //       }
-  //     });
-  //   }
-  // }
+  if (siteProperty) {
+    siteProperties.mine_tenure_type_code = siteProperty.mine_tenure_type_code;
+    if (siteProperty.mine_type_detail) {
+      siteProperty.mine_type_detail.forEach((detail) => {
+        if (detail.mine_commodity_code) {
+          siteProperties.mine_commodity_code.push(detail.mine_commodity_code);
+        } else if (detail.mine_disturbance_code) {
+          siteProperties.mine_disturbance_code.push(detail.mine_disturbance_code);
+        }
+      });
+    }
+  }
 
   return {
     ...noticeOfWork,
@@ -133,6 +135,17 @@ export const getNoticeOfWork = createSelector([getNoticeOfWorkUnformatted], (not
       noticeOfWork.application_reason_codes && noticeOfWork.application_reason_codes.length > 0
         ? noticeOfWork.application_reason_codes.map((c) => c.application_reason_code)
         : [],
-    // site_property: siteProperties,
+    site_property: siteProperties,
   };
 });
+
+export const getNoticeOfWorkEditableTypes = createSelector(
+  [getNoticeOfWorkUnformatted, getDropdownNoticeOfWorkApplicationTypeOptions],
+  (application, applicationTypeOptions) => {
+    const editableOptions = ["QIM", "QCA"];
+    if (application.application_type_code === "NOW") {
+      editableOptions.push("SAG");
+    }
+    return applicationTypeOptions.filter((o) => editableOptions.includes(o.value));
+  }
+);

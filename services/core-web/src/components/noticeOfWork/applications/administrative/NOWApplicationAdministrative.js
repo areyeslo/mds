@@ -19,14 +19,20 @@ const propTypes = {
   handleUpdateInspectors: PropTypes.func.isRequired,
   importNowSubmissionDocumentsJob: PropTypes.objectOf(PropTypes.any),
   isLoaded: PropTypes.bool.isRequired,
+  draftPermitAmendment: CustomPropTypes.permitAmendment.isRequired,
 };
 
 const defaultProps = { importNowSubmissionDocumentsJob: {} };
 
 export const NOWApplicationAdministrative = (props) => {
+  const isNoWApplication = props.noticeOfWork.application_type_code === "NOW";
   return (
     <div>
-      <ScrollContentWrapper id="final-application-package" title="Final Application Package">
+      <ScrollContentWrapper
+        id="final-application-package"
+        title="Final Application Package"
+        isLoaded={props.isLoaded}
+      >
         <FinalPermitDocuments
           mineGuid={props.mineGuid}
           noticeOfWork={props.noticeOfWork}
@@ -34,7 +40,11 @@ export const NOWApplicationAdministrative = (props) => {
           adminView
         />
       </ScrollContentWrapper>
-      <ScrollContentWrapper id="reclamation-securities" title="Reclamation Securities">
+      <ScrollContentWrapper
+        id="reclamation-securities"
+        title="Reclamation Securities"
+        isLoaded={props.isLoaded}
+      >
         <NOWSecurities />
         <br />
         <br />
@@ -45,11 +55,16 @@ export const NOWApplicationAdministrative = (props) => {
           )}
           isViewMode={false}
           isAdminView
+          allowAfterProcess
           disclaimerText="Upload securities-related files here."
           categoriesToShow={["SDO"]}
         />
       </ScrollContentWrapper>
-      <ScrollContentWrapper id="government-documents" title="Government Documents">
+      <ScrollContentWrapper
+        id="government-documents"
+        title="Government Documents"
+        isLoaded={props.isLoaded}
+      >
         <NOWDocuments
           documents={props.noticeOfWork.documents.filter(
             ({ now_application_document_sub_type_code }) =>
@@ -57,12 +72,17 @@ export const NOWApplicationAdministrative = (props) => {
           )}
           isViewMode={false}
           isAdminView
+          allowAfterProcess
           disclaimerText="In this table, add all transitory and internal documents that may be related to the Notice of Work. All documents added to this section will not show up in the final application package unless otherwise specified."
           categoriesToShow={["GDO"]}
         />
       </ScrollContentWrapper>
-      {props.noticeOfWork.application_type_code === "NOW" && (
-        <ScrollContentWrapper id="generated-documents" title="Application Export Files">
+      {(isNoWApplication || props.draftPermitAmendment?.has_permit_conditions) && (
+        <ScrollContentWrapper
+          id="generated-documents"
+          title="Application Export Files"
+          isLoaded={props.isLoaded}
+        >
           <NOWDocuments
             documents={props.noticeOfWork.documents.filter(
               ({
@@ -75,14 +95,20 @@ export const NOWApplicationAdministrative = (props) => {
                   now_application_document_type_code !== "PMA" ||
                   mine_document.document_name.includes("DRAFT"))
             )}
-            isViewMode
-            disclaimerText="This table shows PDFs generated from edited Notice of Work forms and Draft Permits."
+            isViewMode={false}
+            isAdminView
+            allowAfterProcess
+            disclaimerText={
+              props.noticeOfWork.application_type_code === "NOW"
+                ? "This table shows PDFs generated from edited Notice of Work forms and Draft Permits."
+                : "This table shows generated Draft Permit PDFs."
+            }
             categoriesToShow={["AEF"]}
             addDescriptionColumn={false}
           />
         </ScrollContentWrapper>
       )}
-      <ScrollContentWrapper id="inspectors" title="Inspectors">
+      <ScrollContentWrapper id="inspectors" title="Inspectors" isLoaded={props.isLoaded}>
         <AssignInspectors
           inspectors={props.inspectors}
           noticeOfWork={props.noticeOfWork}
@@ -92,7 +118,11 @@ export const NOWApplicationAdministrative = (props) => {
           isLoaded={props.isLoaded}
         />
       </ScrollContentWrapper>
-      <ScrollContentWrapper id="progress-tracking" title="Application Progress Tracking">
+      <ScrollContentWrapper
+        id="progress-tracking"
+        title="Application Progress Tracking"
+        isLoaded={props.isLoaded}
+      >
         <NOWProgressTable />
       </ScrollContentWrapper>
     </div>

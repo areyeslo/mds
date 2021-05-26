@@ -135,7 +135,7 @@ NOW_APPLICATION_PLACER_OPS = api.inherit(
         'details': fields.List(fields.Nested(NOW_APPLICATION_ACTIVITY_DETAIL_BASE, skip_none=True)),
     })
 
-NOW_APPLICATION_SAND_AND_GRAVEL = api.inherit(
+NOW_APPLICATION_SAND_GRAVEL_QUARRY_OPERATION = api.inherit(
     'NOWApplicationSandAndGravel', NOW_APPLICATION_ACTIVITY_SUMMARY_BASE, {
         'average_overburden_depth': fields.Fixed(decimals=2),
         'average_overburden_depth_unit_type_code': fields.String,
@@ -364,7 +364,8 @@ APPLICATION_REASON_CODE_XREF = api.model(
     })
 
 NOW_APPLICATION_MODEL = api.model(
-    'NOW_APPLICATION_MODEL', {
+    'NOW_APPLICATION_MODEL',
+    {
         'now_application_guid':
         fields.String,
         'now_number':
@@ -467,8 +468,8 @@ NOW_APPLICATION_MODEL = api.model(
         fields.Nested(NOW_APPLICATION_MECH_TRENCHING, skip_none=True),
         'placer_operation':
         fields.Nested(NOW_APPLICATION_PLACER_OPS, skip_none=True),
-        'sand_and_gravel':
-        fields.Nested(NOW_APPLICATION_SAND_AND_GRAVEL, skip_none=True),
+        'sand_gravel_quarry_operation':
+        fields.Nested(NOW_APPLICATION_SAND_GRAVEL_QUARRY_OPERATION, skip_none=True),
         'settling_pond':
         fields.Nested(NOW_APPLICATION_SETTLING_POND, skip_none=True),
         'surface_bulk_sample':
@@ -505,6 +506,8 @@ NOW_APPLICATION_MODEL = api.model(
         fields.String,
         'merchantable_timber_volume':
         fields.Fixed(decimals=2),
+        'total_merchantable_timber_volume':
+        fields.Fixed(decimals=2),
         'imported_submission_documents':
         fields.List(fields.Nested(NOW_SUBMISSION_DOCUMENT)),
         'filtered_submission_documents':
@@ -523,7 +526,7 @@ NOW_APPLICATION_MODEL = api.model(
         fields.String,
         'has_source_conditions':
         fields.Boolean,
-        # 'site_property': fields.Nested(MINE_TYPE_MODEL),
+        'site_property': fields.Nested(MINE_TYPE_MODEL),
     })
 
 NOW_APPLICATION_MODEL_EXPORT = api.model(
@@ -559,6 +562,7 @@ NOW_APPLICATION_MODEL_EXPORT = api.model(
         'is_applicant_individual_or_company': fields.String,
         'relationship_to_applicant': fields.String,
         'merchantable_timber_volume': fields.Fixed(decimals=2),
+        'total_merchantable_timber_volume': fields.Fixed(decimals=2),
         'proposed_annual_maximum_tonnage': fields.Fixed(decimals=2),
         'adjusted_annual_maximum_tonnage': fields.Fixed(decimals=2),
         'crown_grant_or_district_lot_numbers': fields.String,
@@ -578,7 +582,7 @@ NOW_APPLICATION_MODEL_EXPORT = api.model(
         'exploration_surface_drilling': fields.Nested(NOW_APPLICATION_EXP_SURFACE_DRILL),
         'mechanical_trenching': fields.Nested(NOW_APPLICATION_MECH_TRENCHING),
         'placer_operation': fields.Nested(NOW_APPLICATION_PLACER_OPS),
-        'sand_and_gravel': fields.Nested(NOW_APPLICATION_SAND_AND_GRAVEL),
+        'sand_gravel_quarry_operation': fields.Nested(NOW_APPLICATION_SAND_GRAVEL_QUARRY_OPERATION),
         'settling_pond': fields.Nested(NOW_APPLICATION_SETTLING_POND),
         'surface_bulk_sample': fields.Nested(NOW_APPLICATION_SURFACE_BULK),
         'underground_exploration': fields.Nested(NOW_APPLICATION_UNDERGROUND_EXPLORATION),

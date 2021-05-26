@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Tabs, Row, Col } from "antd";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { kebabCase } from "lodash";
+import { kebabCase, isEmpty } from "lodash";
 import { getNoticeOfWork, getOriginalNoticeOfWork } from "@common/selectors/noticeOfWorkSelectors";
 import { getMines } from "@common/selectors/mineSelectors";
 import { getGeneratableNoticeOfWorkApplicationDocumentTypeOptions } from "@common/selectors/staticContentSelectors";
@@ -19,6 +19,7 @@ import AdministrativeTab from "@/components/noticeOfWork/applications/administra
 import ProcessPermit from "@/components/noticeOfWork/applications/process/ProcessPermit";
 import ApplicationGuard from "@/HOC/ApplicationGuard";
 import CoreActivities from "@/components/activities/CoreActivities";
+import { getDraftPermitForNOW } from "@common/selectors/permitSelectors";
 
 /**
  * @class NoticeOfWorkApplication- contains all tabs needed for a CORE notice of work application.
@@ -40,6 +41,7 @@ const propTypes = {
   renderTabTitle: PropTypes.func.isRequired,
   applicationPageFromRoute: CustomPropTypes.applicationPageFromRoute,
   mineGuid: PropTypes.string.isRequired,
+  draftPermit: CustomPropTypes.permit.isRequired,
 };
 
 const defaultProps = { applicationPageFromRoute: "" };
@@ -89,6 +91,11 @@ export class NoticeOfWorkApplication extends Component {
   render() {
     const isImported = this.props.noticeOfWork.imported_to_core;
     const verificationComplete = isImported && this.props.noticeOfWork.lead_inspector_party_guid;
+
+    const isNoticeOfWorkTypeDisabled =
+      (this.props.draftPermit && !isEmpty(this.props.draftPermit.permit_guid)) ||
+      !["SAG", "QIM", "QCA"].includes(this.props.noticeOfWork.notice_of_work_type_code);
+
     return (
       <div className="page">
         <NoticeOfWorkPageHeader
@@ -124,7 +131,7 @@ export class NoticeOfWorkApplication extends Component {
                     <div className="center">
                       <h1>Recent Activity</h1>
                     </div>
-                    <CoreActivities target_guid={this.props.noticeOfWork.now_application_guid}/>
+                    <CoreActivities target_guid={this.props.noticeOfWork.now_application_guid} />
                   </Col>
                 </Row>
               </LoadingWrapper>
@@ -138,7 +145,10 @@ export class NoticeOfWorkApplication extends Component {
           >
             {isImported && (
               <LoadingWrapper condition={this.state.isTabLoaded}>
-                <ApplicationTab fixedTop={this.props.fixedTop} />
+                <ApplicationTab
+                  fixedTop={this.props.fixedTop}
+                  isNoticeOfWorkTypeDisabled={isNoticeOfWorkTypeDisabled}
+                />
               </LoadingWrapper>
             )}
           </Tabs.TabPane>
@@ -198,7 +208,10 @@ export class NoticeOfWorkApplication extends Component {
           >
             {verificationComplete && (
               <LoadingWrapper condition={this.state.isTabLoaded}>
-                <DraftPermitTab fixedTop={this.props.fixedTop} />
+                <DraftPermitTab
+                  fixedTop={this.props.fixedTop}
+                  isNoticeOfWorkTypeDisabled={isNoticeOfWorkTypeDisabled}
+                />
               </LoadingWrapper>
             )}
           </Tabs.TabPane>
@@ -233,6 +246,7 @@ const mapStateToProps = (state) => ({
   mines: getMines(state),
   generatableApplicationDocuments: getGeneratableNoticeOfWorkApplicationDocumentTypeOptions(state),
   documentContextTemplate: getDocumentContextTemplate(state),
+  draftPermit: getDraftPermitForNOW(state),
 });
 
 NoticeOfWorkApplication.propTypes = propTypes;
