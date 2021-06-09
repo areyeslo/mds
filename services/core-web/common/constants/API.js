@@ -32,6 +32,8 @@ export const DOCUMENT_MANAGER_FILE_GET_URL = (token = {}) =>
   `/documents?${queryString.stringify(token)}`;
 export const DOCUMENT_MANAGER_TOKEN_GET_URL = (documentManagerGuid) =>
   `/download-token/${documentManagerGuid}`;
+export const DOCUMENT_MANAGER_DOCUMENT = (documentManagerGuid) =>
+  `/documents/${documentManagerGuid}`;
 export const MINESPACE_USER = "/users/minespace";
 export const PROVINCE_CODES = "/parties/sub-division-codes";
 
@@ -188,12 +190,11 @@ export const RECLAMATION_INVOICE_DOCUMENTS = (mineGuid) =>
   `/securities/${mineGuid}/reclamation-invoices/documents`;
 
 // Core Activities
-export const CORE_ACTIVITIES = (params) =>
-  `/core_activity?${queryString.stringify(params)}`;
-  
+export const CORE_ACTIVITIES = (params) => `/core_activity?${queryString.stringify(params)}`;
+
 export const CORE_ACTIVITY_TARGET = (target_guid) =>
-  `/core_activity/subscription${target_guid ? `/${target_guid}` : '' }`
-  
+  `/core_activity/subscription${target_guid ? `/${target_guid}` : ""}`;
+
 export const MINE_COMMENTS = (mineGuid) => `/mines/${mineGuid}/comments`;
 export const MINE_COMMENT = (mineGuid, commentGuid) => `/mines/${mineGuid}/comments/${commentGuid}`;
 
