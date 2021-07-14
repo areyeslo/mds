@@ -10,20 +10,26 @@ import * as Strings from "@common/constants/strings";
 import CustomPropTypes from "@/customPropTypes";
 import CoreTable from "@/components/common/CoreTable";
 import { BOOLEAN_OPTIONS_HASH } from "@common/constants/strings";
+import AuthorizationWrapper from "@/components/common/wrappers/AuthorizationWrapper";
+import * as Permission from "@/constants/permissions";
+import { Button } from "antd";
+import { EDIT_OUTLINE_VIOLET } from "@/constants/assets";
 
 const propTypes = {
   partyRelationships: PropTypes.arrayOf(CustomPropTypes.partyRelationship).isRequired,
   TSFOperatingStatusCodeHash: PropTypes.objectOf(PropTypes.string).isRequired,
   consequenceClassificationStatusCodeHash: PropTypes.objectOf(PropTypes.string).isRequired,
   tailings: PropTypes.arrayOf(PropTypes.any).isRequired,
+  openEditTailingsModal: PropTypes.func.isRequired,
+  handleEditTailings: PropTypes.func.isRequired,
   isLoaded: PropTypes.bool.isRequired,
 };
 
 const defaultProps = {};
 
 export class MineTailingsTable extends Component {
-  transformRowData = (tailings) =>
-    tailings.map((tailing) => ({
+  transformRowData = (tailings) => {
+    return tailings.map((tailing) => ({
       key: tailing.mine_tailings_storage_facility_guid,
       eor_party: this.props.partyRelationships
         .filter(
@@ -34,6 +40,7 @@ export class MineTailingsTable extends Component {
         .sort((a, b) => Date.parse(a.start_date) < Date.parse(b.start_date))[0],
       ...tailing,
     }));
+  };
 
   render() {
     const columns = [
@@ -83,6 +90,27 @@ export class MineTailingsTable extends Component {
         title: "Longitude",
         dataIndex: "longitude",
         render: (text) => <div title="Longitude">{text || Strings.EMPTY_FIELD}</div>,
+      },
+      {
+        key: "operations",
+        render: (text, record) => {
+          return (
+            <div align="right">
+              <AuthorizationWrapper permission={Permission.EDIT_REPORTS}>
+                <Button
+                  type="primary"
+                  size="small"
+                  ghost
+                  onClick={(event) =>
+                    this.props.openEditTailingsModal(event, this.props.handleEditTailings, record)
+                  }
+                >
+                  <img src={EDIT_OUTLINE_VIOLET} alt="Edit Report" />
+                </Button>
+              </AuthorizationWrapper>
+            </div>
+          );
+        },
       },
     ];
 

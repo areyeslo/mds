@@ -122,3 +122,81 @@ class MineTailingsStorageFacilityListResource(Resource, UserMixin):
 
         mine.save()
         return mine_tsf, 201
+
+
+class MineTailingsStorageFacilityResource(Resource, UserMixin):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        'mine_tailings_storage_facility_name',
+        type=str,
+        trim=True,
+        help='Name of the tailings storage facility.',
+        required=True)
+    parser.add_argument(
+        'longitude', type=str, help='Longitude point for the mine.', location='json')
+    parser.add_argument('latitude', type=str, help='Latitude point for the mine.', location='json')
+    parser.add_argument(
+        'consequence_classification_status_code',
+        type=str,
+        trim=True,
+        help='Risk Severity Classification',
+        required=True)
+    parser.add_argument(
+        'tsf_operating_status_code',
+        type=str,
+        trim=True,
+        help='Operating Status of the storage facility',
+        required=True)
+    parser.add_argument(
+        'has_itrb',
+        type=lambda x: True if x.lower() in ("true") else False,
+        trim=True,
+        help='Risk Severity Classification',
+        required=True)
+    parser.add_argument(
+        'eor_party_guid',
+        type=str,
+        help='GUID of the party that is the Engineer of Record for this TSF.',
+        location='json',
+        store_missing=False)
+
+    @api.doc(description='Updates an existing tailing storage facility for the given mine')
+    @requires_role_mine_edit
+    @api.marshal_with(MINE_TSF_MODEL)
+    def put(self, mine_guid, mine_tailings_storage_facility_guid):
+        mine = Mine.find_by_mine_guid(mine_guid)
+
+        if not mine:
+            raise NotFound('Mine not found.')
+
+        mine_tsf = MineTailingsStorageFacility.find_by_tsf_guid(mine_tailings_storage_facility_guid)
+
+        if not mine_tsf:
+            raise NotFound("Tailing Storage Facility not found")
+
+        data = self.parser.parse_args()
+
+        current_app.logger.info(f'Updating {mine_tsf} with {data}')
+        eor_party_guid = data.get('eor_party_guid')
+        if eor_party_guid != None and (mine_tsf.engineer_of_record is None
+                                       or eor_party_guid != mine_tsf.engineer_of_record.party_guid):
+            if mine_tsf.engineer_of_record:
+                mine_tsf.engineer_of_record.end_date = datetime.now(tz=timezone.utc)
+            new_eor = MinePartyAppointment.create(
+                mine=mine,
+                tsf=mine_tsf,
+                party_guid=eor_party_guid,
+                mine_party_appt_type_code='EOR',
+                processed_by=self.get_user_info(),
+                start_date=datetime.now(tz=timezone.utc))
+            related_guid = mine_tsf.mine_tailings_storage_facility_guid
+            new_eor.assign_related_guid('EOR', related_guid)
+            new_eor.save(commit=False)
+
+        for key, value in data.items():
+            if key in ('eor_party_guid'):
+                continue
+            setattr(mine_tsf, key, value)
+
+        mine_tsf.save()
+        return mine_tsf

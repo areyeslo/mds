@@ -1,9 +1,12 @@
 from datetime import datetime
 import uuid
+from flask import current_app
 
 from sqlalchemy.orm import validates
+from sqlalchemy import event
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import FetchedValue
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from app.api.utils.models_mixins import AuditMixin, Base
 from app.extensions import db
@@ -20,9 +23,25 @@ class MineTailingsStorageFacility(AuditMixin, Base):
     consequence_classification_status_code = db.Column(db.String)
     has_itrb = db.Column(db.Boolean)
     tsf_operating_status_code = db.Column(db.String)
+    engineer_of_records = db.relationship(
+        'MinePartyAppointment',
+        lazy='select',
+        primaryjoin=
+        'and_(MinePartyAppointment.mine_tailings_storage_facility_guid == MineTailingsStorageFacility.mine_tailings_storage_facility_guid, MinePartyAppointment.mine_party_appt_type_code == "EOR", MinePartyAppointment.deleted_ind == False)',
+        order_by=
+        'nullsfirst(desc(MinePartyAppointment.start_date)), nullsfirst(desc(MinePartyAppointment.end_date))'
+    )
+
+    @hybrid_property
+    def engineer_of_record(self):
+        if self.engineer_of_records:
+            return self.engineer_of_records[0]
 
     def __repr__(self):
         return '<MineTailingsStorageFacility %r>' % self.mine_guid
+
+    def __str__(self):
+        return f'MineTailingsStorageFacility: mine_tailings_storage_facility_guid: {self.mine_tailings_storage_facility_guid}, mine_guid: {self.mine_guid}, mine_tailings_storage_facility_name: {self.mine_tailings_storage_facility_name}, latitude: {self.latitude}, longitude:{self.longitude}, consequence_classification_status_code: {self.consequence_classification_status_code}, has_itrb: {self.has_itrb}, tsf_operating_status_code: {self.tsf_operating_status_code}'
 
     def json(self):
         return {
@@ -32,8 +51,22 @@ class MineTailingsStorageFacility(AuditMixin, Base):
         }
 
     @classmethod
-    def create(cls, mine, mine_tailings_storage_facility_name, latitude, longitude, consequence_classification_status_code, has_itrb, tsf_operating_status_code,  add_to_session=True):
-        new_tsf = cls(mine_tailings_storage_facility_name=mine_tailings_storage_facility_name, latitude=latitude, longitude=longitude, consequence_classification_status_code=consequence_classification_status_code, has_itrb=has_itrb, tsf_operating_status_code=tsf_operating_status_code)
+    def create(cls,
+               mine,
+               mine_tailings_storage_facility_name,
+               latitude,
+               longitude,
+               consequence_classification_status_code,
+               has_itrb,
+               tsf_operating_status_code,
+               add_to_session=True):
+        new_tsf = cls(
+            mine_tailings_storage_facility_name=mine_tailings_storage_facility_name,
+            latitude=latitude,
+            longitude=longitude,
+            consequence_classification_status_code=consequence_classification_status_code,
+            has_itrb=has_itrb,
+            tsf_operating_status_code=tsf_operating_status_code)
         mine.mine_tailings_storage_facilities.append(new_tsf)
         if add_to_session:
             new_tsf.save(commit=False)
@@ -54,9 +87,11 @@ class MineTailingsStorageFacility(AuditMixin, Base):
         if len(mine_tailings_storage_facility_name) > 60:
             raise AssertionError('Mine name must not exceed 60 characters.')
         #no duplicate TSF names on the same mine
-        if (MineTailingsStorageFacility.query.filter_by(mine_guid=self.mine_guid).filter_by(
-                mine_tailings_storage_facility_name=mine_tailings_storage_facility_name).first() is
-                not None):
+        if (MineTailingsStorageFacility.query.filter_by(mine_guid=self.mine_guid).filter(
+                MineTailingsStorageFacility.mine_tailings_storage_facility_guid !=
+                self.mine_tailings_storage_facility_guid).filter_by(
+                    mine_tailings_storage_facility_name=mine_tailings_storage_facility_name).first(
+                    ) is not None):
             raise AssertionError(
                 f'this mine already has a tailings storage facility named: "{mine_tailings_storage_facility_name}"'
             )
