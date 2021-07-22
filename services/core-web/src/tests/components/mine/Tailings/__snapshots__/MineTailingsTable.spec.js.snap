@@ -39,6 +39,10 @@ exports[`MineTailingsTable renders properly 1`] = `
         "render": [Function],
         "title": "Longitude",
       },
+      Object {
+        "key": "operations",
+        "render": [Function],
+      },
     ]
   }
   condition={true}

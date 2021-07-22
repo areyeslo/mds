@@ -13,6 +13,7 @@ import { fetchPartyRelationships } from "@common/actionCreators/partiesActionCre
 import {
   fetchMineRecordById,
   createTailingsStorageFacility,
+  updateTailingsStorageFacility,
 } from "@common/actionCreators/mineActionCreator";
 import {
   getTSFOperatingStatusCodeOptionsHash,
@@ -49,6 +50,7 @@ const propTypes = {
   openModal: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,
   createTailingsStorageFacility: PropTypes.func.isRequired,
+  updateTailingsStorageFacility: PropTypes.func.isRequired,
   fetchMineRecordById: PropTypes.func.isRequired,
   fetchPartyRelationships: PropTypes.func.isRequired,
   TSFOperatingStatusCodeHash: PropTypes.objectOf(PropTypes.string).isRequired,
@@ -76,6 +78,26 @@ export class MineTailingsInfo extends Component {
       .then(() => this.props.fetchMineReports(report.mine_guid, defaultParams.mineReportType));
   };
 
+  handleEditTailings = (values) => {
+    console.log("values:", values);
+    return this.props
+      .updateTailingsStorageFacility(
+        values.mine_guid,
+        values.mine_tailings_storage_facility_guid,
+        values
+      )
+      .then(() => {
+        this.props.fetchMineRecordById(this.props.mineGuid);
+        this.props.fetchMineReports(this.props.mineGuid, defaultParams.mineReportType);
+        this.props.fetchPartyRelationships({
+          mine_guid: this.props.mineGuid,
+          relationships: "party",
+          include_permit_contacts: "true",
+        });
+      })
+      .then(() => this.props.closeModal());
+  };
+
   handleRemoveReport = (report) => {
     return this.props
       .deleteMineReport(report.mine_guid, report.mine_report_guid)
@@ -93,6 +115,26 @@ export class MineTailingsInfo extends Component {
         mineReportsType: Strings.MINE_REPORTS_TYPE.tailingsReports,
       },
       content: modalConfig.ADD_REPORT,
+    });
+  };
+
+  openEditTailingsModal = (event, onSubmit, record) => {
+    const initialPartyValue = {
+      value: record.eor_party?.party_guid,
+      label: record.eor_party?.party.name,
+    };
+
+    const newRecord = { ...record, has_itrb: record.has_itrb.toString() };
+
+    event.preventDefault();
+    this.props.openModal({
+      props: {
+        initialValues: newRecord,
+        initialPartyValue,
+        onSubmit,
+        title: `Edit TSF for ${record.mine_tailings_storage_facility_name}`,
+      },
+      content: modalConfig.ADD_TAILINGS,
     });
   };
 
@@ -125,7 +167,7 @@ export class MineTailingsInfo extends Component {
   openTailingsModal(event, onSubmit, title) {
     event.preventDefault();
     this.props.openModal({
-      props: { onSubmit, title },
+      props: { onSubmit, title, initialPartyValue: {} },
       content: modalConfig.ADD_TAILINGS,
     });
   }
@@ -177,6 +219,8 @@ export class MineTailingsInfo extends Component {
               <MineTailingsTable
                 tailings={mine.mine_tailings_storage_facilities}
                 isLoaded={this.state.isLoaded}
+                openEditTailingsModal={this.openEditTailingsModal}
+                handleEditTailings={this.handleEditTailings}
               />
             </div>
           </Tabs.TabPane>
@@ -256,6 +300,7 @@ const mapDispatchToProps = (dispatch) =>
       updateMineReport,
       deleteMineReport,
       createTailingsStorageFacility,
+      updateTailingsStorageFacility,
       fetchMineRecordById,
       fetchPartyRelationships,
       openModal,

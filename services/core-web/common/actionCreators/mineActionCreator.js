@@ -111,6 +111,26 @@ export const createTailingsStorageFacility = (mine_guid, payload) => (dispatch) 
     .finally(() => dispatch(hideLoading("modal")));
 };
 
+export const updateTailingsStorageFacility = (mineGuid, TSFGuid, payload) => (dispatch) => {
+  dispatch(request(reducerTypes.UPDATE_TSF));
+  dispatch(showLoading("modal"));
+  return CustomAxios()
+    .put(`${ENVIRONMENT.apiUrl}${API.MINE_TSF(mineGuid, TSFGuid)}`, payload, createRequestHeader())
+    .then((response) => {
+      notification.success({
+        message: "Successfully updated Tailing Storage Facility.",
+        duration: 10,
+      });
+      dispatch(success(reducerTypes.UPDATE_TSF));
+      return response;
+    })
+    .catch((err) => {
+      dispatch(error(reducerTypes.UPDATE_TSF));
+      throw new Error(err);
+    })
+    .finally(() => dispatch(hideLoading("modal")));
+};
+
 export const fetchMineRecords = (params) => (dispatch) => {
   const defaultParams = params || String.DEFAULT_DASHBOARD_PARAMS;
   dispatch(request(reducerTypes.GET_MINE_RECORDS));
