@@ -25,11 +25,6 @@ class StandardPermitCondition(fields.Raw):
         return marshal(value, STANDARD_PERMIT_CONDITION_MODEL)
 
 
-class StandardPermitConditionTemplate(fields.Raw):
-    def format(self, value):
-        return marshal(value, STANDARD_PERMIT_CONDITION_TEMPLATE_MODEL)
-
-
 BASIC_MINE_LOCATION_MODEL = api.model(
     'BasicMineLocation', {
         'latitude': fields.String,
