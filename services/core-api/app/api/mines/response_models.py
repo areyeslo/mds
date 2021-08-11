@@ -338,6 +338,8 @@ MINES_MODEL = api.model(
         'mine_name': fields.String,
         'mine_no': fields.String,
         'mine_note': fields.String,
+        'number_of_contractors': fields.Integer,
+        'number_of_mine_employees': fields.Integer,
         'legacy_mms_mine_status': fields.String,
         'major_mine_ind': fields.Boolean,
         'mine_region': fields.String,

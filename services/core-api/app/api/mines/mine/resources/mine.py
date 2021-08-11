@@ -3,6 +3,7 @@ import uuid
 from decimal import Decimal
 from datetime import datetime
 from flask import request
+from sqlalchemy.sql.sqltypes import Integer
 from flask_restplus import Resource, reqparse, inputs
 from sqlalchemy_filters import apply_sort, apply_pagination, apply_filters
 from werkzeug.exceptions import BadRequest, NotFound
@@ -48,6 +49,16 @@ class MineListResource(Resource, UserMixin):
         'latitude',
         type=lambda x: Decimal(x) if x else None,
         help='Latitude point for the mine.',
+        location='json')
+    parser.add_argument(
+        'number_of_contractors',
+        type=Integer,
+        help='Number of contractors.',
+        location='json')
+    parser.add_argument(
+        'number_of_mine_employees',
+        type=Integer,
+        help='Number of mine employees.',
         location='json')
     parser.add_argument(
         'mine_status',
@@ -156,6 +167,8 @@ class MineListResource(Resource, UserMixin):
             union_ind=data.get('union_ind'),
             latitude=lat,
             longitude=lon,
+            number_of_contractors = data.get('number_of_contractors'),
+            number_of_mine_employees = data.get('number_of_mine_employees'),
             government_agency_type_code=data.get('government_agency_type_code'),
             exemption_fee_status_code=data.get('exemption_fee_status_code'),
             exemption_fee_status_note=data.get('exemption_fee_status_note'))
@@ -311,6 +324,16 @@ class MineResource(Resource, UserMixin):
         store_missing=False,
         location='json')
     parser.add_argument(
+        'number_of_contractors',
+        type=Integer,
+        help='Number of contractors.',
+        location='json')
+    parser.add_argument(
+        'number_of_mine_employees',
+        type=Integer,
+        help='Number of mine employees.',
+        location='json')
+    parser.add_argument(
         'mine_status',
         action='split',
         help=
@@ -405,7 +428,8 @@ class MineResource(Resource, UserMixin):
             mine.latitude = data['latitude']
             mine.longitude = data['longitude']
             refresh_cache = True
-
+        mine.number_of_contractors = data.get('number_of_contractors')
+        mine.number_of_mine_employees = data.get('number_of_mine_employees')
         mine.government_agency_type_code = data.get('government_agency_type_code')
         mine.exemption_fee_status_code = data.get('exemption_fee_status_code')
         mine.exemption_fee_status_note = data.get('exemption_fee_status_note')
