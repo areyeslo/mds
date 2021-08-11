@@ -125,6 +125,10 @@ class Mine(SoftDeleteMixin, AuditMixin, Base):
     def __repr__(self):
         return '<Mine %r>' % self.mine_guid
 
+    def __str__(self):
+        return f'{self.__class__.__name__} mine_guid: {self.mine_guid}, mine_no: {self.mine_no}, mine_name: {self.mine_name}, mine_note: {self.mine_note}, latitude: {self.latitude}, longitude: {self.longitude}, number_of_contractors: {self.number_of_contractors}, number_of_mine_employees: {self.number_of_mine_employees}'
+
+
     @reconstructor
     def init_on_load(self):
         if self.latitude and self.longitude:

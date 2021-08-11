@@ -338,8 +338,6 @@ MINES_MODEL = api.model(
         'mine_name': fields.String,
         'mine_no': fields.String,
         'mine_note': fields.String,
-        'number_of_contractors': fields.Integer,
-        'number_of_mine_employees': fields.Integer,
         'legacy_mms_mine_status': fields.String,
         'major_mine_ind': fields.Boolean,
         'mine_region': fields.String,
@@ -360,7 +358,9 @@ MINE_MODEL = api.inherit(
         'mine_location': fields.Nested(MINE_LOCATION_MODEL),
         'exemption_fee_status_code': fields.String,
         'exemption_fee_status_note': fields.String,
-        'government_agency_type_code': fields.String
+        'government_agency_type_code': fields.String,
+        'number_of_contractors': fields.Integer,
+        'number_of_mine_employees': fields.Integer,
     })
 
 MINE_LIST_MODEL = api.model(

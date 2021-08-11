@@ -17,6 +17,7 @@ import {
   lat,
   lon,
   validateSelectOptions,
+  integer,
 } from "@common/utils/Validate";
 import { getCurrentMineTypes } from "@common/selectors/mineSelectors";
 import {
@@ -506,6 +507,30 @@ export class MineRecordForm extends Component {
             <FieldArray name="mine_types" component={renderTypeSelect} />
           </>
         )}
+        <Row gutter={16}>
+          <Col md={12} xs={24}>
+            <Form.Item>
+              <Field
+                id="number_of_contractors"
+                name="number_of_contractors"
+                label="Number of Contractors"
+                component={renderConfig.FIELD}
+                validate={[integer, required]}
+              />
+            </Form.Item>
+          </Col>
+          <Col md={12} xs={24}>
+            <Form.Item>
+              <Field
+                id="number_of_mine_employees"
+                name="number_of_mine_employees"
+                label="Number of mine employees"
+                component={renderConfig.FIELD}
+                validate={[integer, required]}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item>

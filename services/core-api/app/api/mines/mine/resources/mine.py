@@ -324,16 +324,6 @@ class MineResource(Resource, UserMixin):
         store_missing=False,
         location='json')
     parser.add_argument(
-        'number_of_contractors',
-        type=Integer,
-        help='Number of contractors.',
-        location='json')
-    parser.add_argument(
-        'number_of_mine_employees',
-        type=Integer,
-        help='Number of mine employees.',
-        location='json')
-    parser.add_argument(
         'mine_status',
         action='split',
         help=
@@ -379,6 +369,16 @@ class MineResource(Resource, UserMixin):
         help='Government agency the mine belongs to.',
         store_missing=False,
         trim=True,
+        location='json')
+    parser.add_argument(
+        'number_of_contractors',
+        type=int,
+        help='Number of contractors.',
+        location='json')
+    parser.add_argument(
+        'number_of_mine_employees',
+        type=int,
+        help='Number of mine employees.',
         location='json')
 
     @api.doc(description='Returns the specific mine from the mine_guid or mine_no provided.')

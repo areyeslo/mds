@@ -55,6 +55,8 @@ const propTypes = {
   userInfo: PropTypes.shape({ preferred_username: PropTypes.string.isRequired }).isRequired,
   exemptionFeeStatusOptionsHash: PropTypes.objectOf(PropTypes.string).isRequired,
   governmentAgencyHash: PropTypes.objectOf(PropTypes.string).isRequired,
+  number_of_contractors: CustomPropTypes.mine.isRequired,
+  number_of_mine_employees: CustomPropTypes.mine.isRequired,
 };
 
 export class MineHeader extends Component {
@@ -119,6 +121,8 @@ export class MineHeader extends Component {
       exemption_fee_status_code: mine.exemption_fee_status_code,
       exemption_fee_status_note: mine.exemption_fee_status_note,
       government_agency_type_code: mine.government_agency_type_code,
+      number_of_contractors: mine.number_of_contractors,
+      number_of_mine_employees: mine.number_of_mine_employees,
     };
     this.props.openModal({
       props: {
@@ -311,6 +315,21 @@ export class MineHeader extends Component {
               </div>
             </>
           )}
+          <div className="inline-flex padding-sm wrap">
+            <p className="field-title">Number of Contractors</p>
+            <div>
+              {this.props.mine.number_of_contractors ? this.props.mine.number_of_contractors : 0}
+            </div>
+          </div>
+
+          <div className="inline-flex padding-sm wrap">
+            <p className="field-title">Number of Mine Employees</p>
+            <div>
+              {this.props.mine.number_of_mine_employees
+                ? this.props.mine.number_of_mine_employees
+                : 0}
+            </div>
+          </div>
         </div>
         <div className="dashboard__header--card__map">
           <MineHeaderMapLeaflet mine={this.props.mine} />
