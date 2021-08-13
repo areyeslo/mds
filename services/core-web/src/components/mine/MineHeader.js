@@ -121,8 +121,8 @@ export class MineHeader extends Component {
       exemption_fee_status_code: mine.exemption_fee_status_code,
       exemption_fee_status_note: mine.exemption_fee_status_note,
       government_agency_type_code: mine.government_agency_type_code,
-      number_of_contractors: mine.number_of_contractors,
-      number_of_mine_employees: mine.number_of_mine_employees,
+      number_of_contractors: mine.number_of_contractors ? mine.number_of_contractors : 0,
+      number_of_mine_employees: mine.number_of_mine_employees ? mine.number_of_mine_employees : 0,
     };
     this.props.openModal({
       props: {
@@ -315,19 +315,16 @@ export class MineHeader extends Component {
               </div>
             </>
           )}
-          <div className="inline-flex padding-sm wrap">
-            <p className="field-title">Number of Contractors</p>
-            <div>
-              {this.props.mine.number_of_contractors ? this.props.mine.number_of_contractors : 0}
-            </div>
-          </div>
 
-          <div className="inline-flex padding-sm wrap">
-            <p className="field-title">Number of Mine Employees</p>
+          <div className="inline-flex flex-start">
             <div>
-              {this.props.mine.number_of_mine_employees
-                ? this.props.mine.number_of_mine_employees
-                : 0}
+              <div className="field-title">Number of Mine Employees</div>
+              <div>{this.props.mine.number_of_mine_employees}</div>
+              <CoreTooltip title="Approximate number of workers on site" />
+            </div>
+            <div>
+              <div className="field-title">Number of Contractors</div>
+              <div>{this.props.mine.number_of_contractors}</div>
             </div>
           </div>
         </div>
