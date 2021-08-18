@@ -13,7 +13,7 @@ import {
 import { getTransformedMineTypes } from "@common/selectors/mineSelectors";
 import { updateMineRecord } from "@common/actionCreators/mineActionCreator";
 import { openModal, closeModal } from "@common/actions/modalActions";
-import WorkerInformation from "@/components/Forms/mines/WorkerInformation";
+import { WorkerInfoEmployee } from "./WorkerInfoEmployee";
 import { getUserInfo } from "@/selectors/authenticationSelectors";
 import CustomPropTypes from "@/customPropTypes";
 import ContactCard from "@/components/common/ContactCard";
@@ -21,12 +21,12 @@ import MinistryContactItem from "@/components/dashboard/mine/overview/MinistryCo
 import * as Strings from "@/constants/strings";
 import * as Contacts from "@/constants/contacts";
 import Map from "@/components/common/Map";
-import { modalConfig } from "@/components/modalContent/config";
 
 const { Paragraph, Title } = Typography;
 
 const propTypes = {
   mine: PropTypes.objectOf(CustomPropTypes.mine).isRequired,
+  mineGuid: PropTypes.string.isRequired,
   partyRelationships: PropTypes.arrayOf(CustomPropTypes.partyRelationship).isRequired,
   mineRegionHash: PropTypes.objectOf(PropTypes.string).isRequired,
   mineDisturbanceOptionsHash: PropTypes.objectOf(PropTypes.string).isRequired,
@@ -34,11 +34,7 @@ const propTypes = {
   transformedMineTypes: CustomPropTypes.transformedMineTypes.isRequired,
   userInfo: PropTypes.shape({ preferred_username: PropTypes.string.isRequired }).isRequired,
   fetchMineRecordById: PropTypes.func.isRequired,
-  // number_of_contractors: mine.number_of_contractors,
-  // number_of_mine_employees: mine.number_of_mine_employees,
   updateMineRecord: PropTypes.func.isRequired,
-  openModal: PropTypes.func.isRequired,
-  // closeModal: PropTypes.func.isRequired,
 };
 
 export class Overview extends Component {
@@ -62,31 +58,10 @@ export class Overview extends Component {
   getMajorMineRegionalContacts = (region) =>
     Object.values(Contacts.MAJOR_MINE_REGIONAL_CONTACTS[region]);
 
-  handleEditWorkerInfo = () => {
-    return this.props
-      .updateMineRecord(
-        this.props.mine.mine_guid,
-        this.props.mine.number_of_contractors,
-        this.props.mine.number_of_mine_employees,
-        this.props.mine.mine_name
-      )
-      .then(() => {
-        this.props.fetchMineRecordById(this.props.mine.mine_guid);
-      });
-  };
-
-  OpenEditWorkerInfoModal = (event) => {
-    event.preventDefault();
-    // console.log(this.props);
-    this.props.openModal({
-      props: {
-        onSubmit: this.handleEditWorkerInfo,
-        title: "Edit Worker Information",
-        mineGuid: this.props.mine.mine_guid,
-        numberOfMineEmployees: this.props.mine.number_of_mine_employees,
-        numberContractors: this.props.mine.number_of_contractors,
-      },
-      content: modalConfig.EDIT_WORKER_INFO,
+  handleEditWorkerInfo = (values) => {
+    console.log(values);
+    return this.props.updateMineRecord(values).then(() => {
+      this.props.fetchMineRecordById(this.props.mineGuid);
     });
   };
 
@@ -142,10 +117,8 @@ export class Overview extends Component {
                 : Strings.NONE}
             </Descriptions.Item>
           </Descriptions>
-          <WorkerInformation
+          <WorkerInfoEmployee
             mine={this.props.mine}
-            // isLoaded={this.state.isLoaded}
-            openEditWorkerInfoModal={this.OpenEditWorkerInfoModal}
             handleEditWorkerInfo={this.handleEditWorkerInfo}
           />
           <Row gutter={[16, 16]}>
