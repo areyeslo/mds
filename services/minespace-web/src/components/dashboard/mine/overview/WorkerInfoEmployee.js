@@ -31,18 +31,6 @@ export class WorkerInfoEmployee extends Component {
   render() {
     return (
       <div>
-        <div align="right">
-          <AuthorizationWrapper permission={Permission.EDIT_WORKER_INFO}>
-            <Button
-              type="primary"
-              size="small"
-              ghost
-              onClick={(event) => this.handleToggleEdit(event)}
-            >
-              <img src={EDIT_PENCIL} alt="Edit Worker Info" />
-            </Button>
-          </AuthorizationWrapper>
-        </div>
         {this.state.isEditable ? (
           <div>
             <EditWorkerInformationForm
@@ -52,6 +40,18 @@ export class WorkerInfoEmployee extends Component {
           </div>
         ) : (
           <div>
+            <div align="right">
+              <AuthorizationWrapper permission={Permission.EDIT_WORKER_INFO}>
+                <Button
+                  type="primary"
+                  size="small"
+                  ghost
+                  onClick={(event) => this.handleToggleEdit(event)}
+                >
+                  <img src={EDIT_PENCIL} alt="Edit Worker Info" />
+                </Button>
+              </AuthorizationWrapper>
+            </div>
             <Row gutter={[0, 16]}>
               <Col lg={{ span: 14 }} xl={{ span: 16 }}>
                 <Title level={4}>Worker Information</Title>

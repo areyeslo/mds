@@ -26,7 +26,6 @@ const { Paragraph, Title } = Typography;
 
 const propTypes = {
   mine: PropTypes.objectOf(CustomPropTypes.mine).isRequired,
-  mineGuid: PropTypes.string.isRequired,
   partyRelationships: PropTypes.arrayOf(CustomPropTypes.partyRelationship).isRequired,
   mineRegionHash: PropTypes.objectOf(PropTypes.string).isRequired,
   mineDisturbanceOptionsHash: PropTypes.objectOf(PropTypes.string).isRequired,
@@ -35,6 +34,7 @@ const propTypes = {
   userInfo: PropTypes.shape({ preferred_username: PropTypes.string.isRequired }).isRequired,
   fetchMineRecordById: PropTypes.func.isRequired,
   updateMineRecord: PropTypes.func.isRequired,
+  createMineTypes: PropTypes.func.isRequired,
 };
 
 export class Overview extends Component {
@@ -58,11 +58,22 @@ export class Overview extends Component {
   getMajorMineRegionalContacts = (region) =>
     Object.values(Contacts.MAJOR_MINE_REGIONAL_CONTACTS[region]);
 
-  handleEditWorkerInfo = (values) => {
-    console.log(values);
-    return this.props.updateMineRecord(values).then(() => {
-      this.props.fetchMineRecordById(this.props.mineGuid);
-    });
+  handleEditWorkerInfo = (value) => {
+    const mineStatus = value.mine_status.join(",");
+    return this.props
+      .updateMineRecord(
+        this.props.mine.mine_guid,
+        {
+          ...value,
+          mine_status: mineStatus,
+        },
+        value.mine_name
+      )
+      .then(() => {
+        this.props.createMineTypes(this.props.mine.mine_guid, value.mine_types).then(() => {
+          this.props.fetchMineRecordById(this.props.mine.mine_guid);
+        });
+      });
   };
 
   render() {
