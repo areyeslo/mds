@@ -34,7 +34,6 @@ const propTypes = {
   userInfo: PropTypes.shape({ preferred_username: PropTypes.string.isRequired }).isRequired,
   fetchMineRecordById: PropTypes.func.isRequired,
   updateMineRecord: PropTypes.func.isRequired,
-  createMineTypes: PropTypes.func.isRequired,
 };
 
 export class Overview extends Component {
@@ -59,21 +58,16 @@ export class Overview extends Component {
     Object.values(Contacts.MAJOR_MINE_REGIONAL_CONTACTS[region]);
 
   handleEditWorkerInfo = (value) => {
-    const mineStatus = value.mine_status.join(",");
     return this.props
       .updateMineRecord(
         this.props.mine.mine_guid,
         {
-          ...value,
-          mine_status: mineStatus,
+          number_of_contractors: value.number_of_contractors,
+          number_of_mine_employees: value.number_of_mine_employees,
         },
         value.mine_name
       )
-      .then(() => {
-        this.props.createMineTypes(this.props.mine.mine_guid, value.mine_types).then(() => {
-          this.props.fetchMineRecordById(this.props.mine.mine_guid);
-        });
-      });
+      .then(() => this.props.fetchMineRecordById(this.props.mine.mine_guid));
   };
 
   render() {
